@@ -12,11 +12,11 @@ Config.RanchBlip = {
 
 Config.RanchLocations = {
     {
-        name     = 'Macfarlane Ranch',
-        id       = 'macfarranch',
-        coords   = vector3(-2375.171, -2374.125, 62.37881),
-		job      = 'macfarrancher',
-        showblip = true
+        name = 'Macfarlane Ranch',
+        id = 'macfarranch',
+        coords = vector3(-2375.171, -2374.125, 62.37881),
+		job = 'macfarrancher',
+        showblip   = true
     },
 }
 
