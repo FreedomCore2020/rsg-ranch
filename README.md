@@ -1,5 +1,3 @@
-# WIP DO NOT USE
-
 # RexshackGaming
 - discord : https://discord.gg/eW3ADkf4Af
 - youtube : https://www.youtube.com/channel/UCikEgGfXO-HCPxV5rYHEVbA
@@ -16,7 +14,7 @@
 
 # add to shared jobs
 ```lua
-    ['macfarrancher'] = {
+    ['macfarranch'] = {
         label = 'Macfarlane Rancher',
         defaultDuty = true,
         offDutyPay = false,

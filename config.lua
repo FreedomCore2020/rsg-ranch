@@ -1,7 +1,14 @@
-Config = {}
+Config = Config or {}
+Config.RanchAnimals = {}
 
 -- settings
 Config.Keybind = 'J'
+Config.MaxAnimalCount = 50
+
+-- authorised jobs
+Config.AuthorisedJobs = {
+    'macfarranch',
+}
 
 -- blacksmith blip settings
 Config.RanchBlip = {
@@ -13,9 +20,9 @@ Config.RanchBlip = {
 Config.RanchLocations = {
     {
         name = 'Macfarlane Ranch',
-        id = 'macfarranch',
+        ranchid = 'macfarranch',
         coords = vector3(-2375.171, -2374.125, 62.37881),
-		job = 'macfarrancher',
+        job = 'macfarranch',
         showblip   = true
     },
 }
