@@ -1,4 +1,6 @@
 local RSGCore = exports['rsg-core']:GetCoreObject()
+local SpawnedAnimals = {}
+local isBusy = false
 
 -------------------------------------------------------------------------------------------
 -- prompts and blips
@@ -87,4 +89,74 @@ end)
 RegisterNetEvent('rsg-ranch:client:updateAnimalData')
 AddEventHandler('rsg-ranch:client:updateAnimalData', function(data)
     Config.RanchAnimals = data
+end)
+
+-- spawn ranch animals
+Citizen.CreateThread(function()
+    while true do
+        Wait(150)
+
+        local ped = PlayerPedId()
+        local pos = GetEntityCoords(ped)
+        local InRange = false
+
+        for i = 1, #Config.RanchAnimals do
+        
+            local dist = GetDistanceBetweenCoords(pos.x, pos.y, pos.z, Config.RanchAnimals[i].x, Config.RanchAnimals[i].y, Config.RanchAnimals[i].z, true)
+            
+            if dist >= 50.0 then goto continue end
+
+            local hasSpawned = false
+            InRange = true
+
+            for z = 1, #SpawnedAnimals do
+                local p = SpawnedAnimals[z]
+
+                if p.id == Config.RanchAnimals[i].id then
+                    hasSpawned = true
+                end
+            end
+
+            if hasSpawned then goto continue end
+
+            local modelHash = Config.RanchAnimals[i].hash
+            local data = {}
+            
+            if not HasModelLoaded(modelHash) then
+                RequestModel(modelHash)
+                while not HasModelLoaded(modelHash) do
+                    Wait(1)
+                end
+            end
+            
+            data.id = Config.RanchAnimals[i].id
+            data.obj = CreatePed(modelHash, Config.RanchAnimals[i].x, Config.RanchAnimals[i].y, Config.RanchAnimals[i].z -1.2, true, true, false)
+            SetEntityHeading(data.obj, Config.RanchAnimals[i].h)
+            Citizen.InvokeNative(0x77FF8D35EEC6BBC4, data.obj, 0, false)
+            Citizen.InvokeNative(0xBB9CE077274F6A1B, data.obj, 10.0, 10)
+            SetEntityAsMissionEntity(data.obj, true)
+            SetModelAsNoLongerNeeded(data.obj)
+
+            SpawnedAnimals[#SpawnedAnimals + 1] = data
+            hasSpawned = false
+
+            ::continue::
+        end
+
+        if not InRange then
+            Wait(5000)
+        end
+    end
+end)
+
+AddEventHandler('onResourceStop', function(resource)
+    if resource ~= GetCurrentResourceName() then return end
+
+    for i = 1, #SpawnedAnimals do
+        local animals = SpawnedAnimals[i].obj
+
+        SetEntityAsMissionEntity(animals, false)
+        FreezeEntityPosition(animals, false)
+        DeletePed(animals)
+    end
 end)

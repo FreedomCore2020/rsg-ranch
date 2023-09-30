@@ -1,4 +1,5 @@
 local RSGCore = exports['rsg-core']:GetCoreObject()
+local AnimalsLoaded = false
 
 -----------------------------------------------------------------------
 -- version checker
@@ -35,6 +36,37 @@ end
 RSGCore.Functions.CreateUseableItem("cow", function(source)
     local src = source
     TriggerClientEvent('rsg-ranch:client:newanimal', src, 'cow', `A_C_Cow`)
+end)
+
+-----------------------------------------------------------------------
+
+-- update animal data
+CreateThread(function()
+    while true do
+        Wait(5000)
+        if AnimalsLoaded then
+            TriggerClientEvent('rsg-ranch:client:updateAnimalData', -1, Config.RanchAnimals)
+        end
+    end
+end)
+
+CreateThread(function()
+    TriggerEvent('rsg-gangcamp:server:getAnimals')
+    AnimalsLoaded = true
+end)
+
+-- get props
+RegisterServerEvent('rsg-gangcamp:server:getAnimals')
+AddEventHandler('rsg-gangcamp:server:getAnimals', function()
+    local result = MySQL.query.await('SELECT * FROM player_ranch')
+
+    if not result[1] then return end
+
+    for i = 1, #result do
+        local animalData = json.decode(result[i].animals)
+        print('loading '..animalData.animal..' prop with ID: '..animalData.id)
+        table.insert(Config.RanchAnimals, animalData)
+    end
 end)
 
 -----------------------------------------------------------------------
