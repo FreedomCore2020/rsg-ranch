@@ -136,31 +136,31 @@ Citizen.CreateThread(function()
             data.obj = CreatePed(modelHash, Config.RanchAnimals[i].x, Config.RanchAnimals[i].y, Config.RanchAnimals[i].z -1.2, true, true, false)
             SetEntityHeading(data.obj, Config.RanchAnimals[i].h)
             Citizen.InvokeNative(0x77FF8D35EEC6BBC4, data.obj, 0, false)
-			Citizen.InvokeNative(0xE054346CA3A0F315, data.obj, Config.RanchAnimals[i].x, Config.RanchAnimals[i].y, Config.RanchAnimals[i].z, 50.0, tonumber(1077936128), tonumber(1086324736), 1)
-			Citizen.InvokeNative(0x23f74c2fda6e7c61, -1749618580, data.obj)
+            Citizen.InvokeNative(0xE054346CA3A0F315, data.obj, Config.RanchAnimals[i].x, Config.RanchAnimals[i].y, Config.RanchAnimals[i].z, 50.0, tonumber(1077936128), tonumber(1086324736), 1)
+            Citizen.InvokeNative(0x23f74c2fda6e7c61, -1749618580, data.obj)
             SetEntityAsMissionEntity(data.obj, true)
             SetModelAsNoLongerNeeded(data.obj)
 
             SpawnedAnimals[#SpawnedAnimals + 1] = data
             hasSpawned = false
-			
-			-- create animal target
-			exports['rsg-target']:AddTargetEntity(data.obj, {
-				options = {
-					{
-						type = "client",
-						event = 'rsg-ranch:client:testtarget',
-						id = Config.RanchAnimals[i].id,
-						ranchid = Config.RanchAnimals[i].ranchid,
-						animal = Config.RanchAnimals[i].animal,
-						hash = Config.RanchAnimals[i].hash,
-						borntime = Config.RanchAnimals[i].borntime,
-						icon = "far fa-eye",
-						label = 'Check Animal',
-						distance = 3.0
-					}
-				}
-			})
+            
+            -- create animal target
+            exports['rsg-target']:AddTargetEntity(data.obj, {
+                options = {
+                    {
+                        type = "client",
+                        event = 'rsg-ranch:client:testtarget',
+                        id = Config.RanchAnimals[i].id,
+                        ranchid = Config.RanchAnimals[i].ranchid,
+                        animal = Config.RanchAnimals[i].animal,
+                        hash = Config.RanchAnimals[i].hash,
+                        borntime = Config.RanchAnimals[i].borntime,
+                        icon = "far fa-eye",
+                        label = 'Check Animal',
+                        distance = 3.0
+                    }
+                }
+            })
 
             ::continue::
         end
@@ -172,7 +172,7 @@ Citizen.CreateThread(function()
 end)
 
 RegisterNetEvent('rsg-ranch:client:testtarget', function(data)
-	print(data.id, data.ranchid, data.animal, data.borntime)
+    print(data.id, data.ranchid, data.animal, data.borntime)
 end)
 
 AddEventHandler('onResourceStop', function(resource)
@@ -192,27 +192,27 @@ end)
 --[[
 RegisterNetEvent('rsg-ranch:client:testoutput', function()
 
-	for i = 1, #Config.RanchAnimals do
-		id = Config.RanchAnimals[i].id
-		ranchid = Config.RanchAnimals[i].ranchid
-		animal = Config.RanchAnimals[i].animal
-		hash = Config.RanchAnimals[i].hash
-		borntime = Config.RanchAnimals[i].borntime
-		posx = Config.RanchAnimals[i].x
-		posy = Config.RanchAnimals[i].y
-		posz = Config.RanchAnimals[i].z
-		posh = Config.RanchAnimals[i].h
-		
-		print('id '..id)
-		print('ranchid '..ranchid)
-		print('animal '..animal)
-		print('hash '..hash)
-		print('borntime '..borntime)
-		print('posx '..posx)
-		print('posy '..posy)
-		print('posz '..posz)
-		print('posh '..posh)
-	end
+    for i = 1, #Config.RanchAnimals do
+        id = Config.RanchAnimals[i].id
+        ranchid = Config.RanchAnimals[i].ranchid
+        animal = Config.RanchAnimals[i].animal
+        hash = Config.RanchAnimals[i].hash
+        borntime = Config.RanchAnimals[i].borntime
+        posx = Config.RanchAnimals[i].x
+        posy = Config.RanchAnimals[i].y
+        posz = Config.RanchAnimals[i].z
+        posh = Config.RanchAnimals[i].h
+        
+        print('id '..id)
+        print('ranchid '..ranchid)
+        print('animal '..animal)
+        print('hash '..hash)
+        print('borntime '..borntime)
+        print('posx '..posx)
+        print('posy '..posy)
+        print('posz '..posz)
+        print('posh '..posh)
+    end
 
 end)
 --]]

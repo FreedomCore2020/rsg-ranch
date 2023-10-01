@@ -81,7 +81,7 @@ AddEventHandler('rsg-ranch:server:newanimal', function(animal, pos, heading, has
     {
         id = animalid,
         animal = animal,
-		health = 100,
+        health = 100,
         x = pos.x,
         y = pos.y,
         z = pos.z,
@@ -137,13 +137,13 @@ UpkeepInterval = function()
     if not result then goto continue end
 
     for i = 1, #result do
-		local animalData = json.decode(result[i].animals)
+        local animalData = json.decode(result[i].animals)
         if animalData.health >= 1 then
-		
+        
             local healthadjust = (animalData.health - 1)
-			local id = animalData.id
+            local id = animalData.id
             MySQL.update('UPDATE player_ranch SET credit = ? WHERE propid = ?', { creditadjust, row.propid })
-			MySQL.Async.execute("UPDATE players SET `animals` = ? WHERE `id`= ? AND `license`= ?", {json.encode(Charinfo), citizenid, license})
+            MySQL.Async.execute("UPDATE players SET `animals` = ? WHERE `id`= ? AND `license`= ?", {json.encode(Charinfo), citizenid, license})
         else
             MySQL.update('DELETE FROM player_props WHERE propid = ?', {row.propid})
 
