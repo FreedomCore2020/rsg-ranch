@@ -10,10 +10,7 @@ Citizen.CreateThread(function()
         exports['rsg-core']:createPrompt(v.ranchid, v.coords, RSGCore.Shared.Keybinds[Config.Keybind], 'Open '..v.name, {
             type = 'client',
             event = 'rsg-ranch:client:mainmenu',
-            args = { 
-                job = v.job,
-                ranch = v.ranchid
-            },
+            args = { v.job },
         })
         if v.showblip == true then
             local RanchMenuBlip = Citizen.InvokeNative(0x554D9D53F696D002, 1664425300, v.coords)
@@ -25,10 +22,10 @@ Citizen.CreateThread(function()
 end)
 -------------------------------------------------------------------------------------------
 
-RegisterNetEvent('rsg-ranch:client:mainmenu', function(data)
+RegisterNetEvent('rsg-ranch:client:mainmenu', function(job)
     local PlayerData = RSGCore.Functions.GetPlayerData()
     local playerjob = PlayerData.job.name
-    jobaccess = data.job
+    jobaccess = job
     if playerjob == jobaccess then
         lib.registerContext({
             id = 'ranch_mainmenu',
@@ -39,6 +36,13 @@ RegisterNetEvent('rsg-ranch:client:mainmenu', function(data)
                     description = 'access boss menu',
                     icon = 'fa-solid fa-hat-cowboy',
                     event = 'rsg-bossmenu:client:mainmenu',
+                    arrow = true
+                },
+                {
+                    title = 'Test Output',
+                    description = 'access boss menu',
+                    icon = 'fa-solid fa-hat-cowboy',
+                    event = 'rsg-ranch:client:testoutput',
                     arrow = true
                 },
             }
@@ -111,7 +115,6 @@ Citizen.CreateThread(function()
 
             for z = 1, #SpawnedAnimals do
                 local p = SpawnedAnimals[z]
-
                 if p.id == Config.RanchAnimals[i].id then
                     hasSpawned = true
                 end
@@ -133,12 +136,31 @@ Citizen.CreateThread(function()
             data.obj = CreatePed(modelHash, Config.RanchAnimals[i].x, Config.RanchAnimals[i].y, Config.RanchAnimals[i].z -1.2, true, true, false)
             SetEntityHeading(data.obj, Config.RanchAnimals[i].h)
             Citizen.InvokeNative(0x77FF8D35EEC6BBC4, data.obj, 0, false)
-            Citizen.InvokeNative(0xBB9CE077274F6A1B, data.obj, 10.0, 10)
+			Citizen.InvokeNative(0xE054346CA3A0F315, data.obj, Config.RanchAnimals[i].x, Config.RanchAnimals[i].y, Config.RanchAnimals[i].z, 50.0, tonumber(1077936128), tonumber(1086324736), 1)
+			Citizen.InvokeNative(0x23f74c2fda6e7c61, -1749618580, data.obj)
             SetEntityAsMissionEntity(data.obj, true)
             SetModelAsNoLongerNeeded(data.obj)
 
             SpawnedAnimals[#SpawnedAnimals + 1] = data
             hasSpawned = false
+			
+			-- create animal target
+			exports['rsg-target']:AddTargetEntity(data.obj, {
+				options = {
+					{
+						type = "client",
+						event = 'rsg-ranch:client:testtarget',
+						id = Config.RanchAnimals[i].id,
+						ranchid = Config.RanchAnimals[i].ranchid,
+						animal = Config.RanchAnimals[i].animal,
+						hash = Config.RanchAnimals[i].hash,
+						borntime = Config.RanchAnimals[i].borntime,
+						icon = "far fa-eye",
+						label = 'Check Animal',
+						distance = 3.0
+					}
+				}
+			})
 
             ::continue::
         end
@@ -147,6 +169,10 @@ Citizen.CreateThread(function()
             Wait(5000)
         end
     end
+end)
+
+RegisterNetEvent('rsg-ranch:client:testtarget', function(data)
+	print(data.id, data.ranchid, data.animal, data.borntime)
 end)
 
 AddEventHandler('onResourceStop', function(resource)
@@ -160,3 +186,33 @@ AddEventHandler('onResourceStop', function(resource)
         DeletePed(animals)
     end
 end)
+
+
+
+--[[
+RegisterNetEvent('rsg-ranch:client:testoutput', function()
+
+	for i = 1, #Config.RanchAnimals do
+		id = Config.RanchAnimals[i].id
+		ranchid = Config.RanchAnimals[i].ranchid
+		animal = Config.RanchAnimals[i].animal
+		hash = Config.RanchAnimals[i].hash
+		borntime = Config.RanchAnimals[i].borntime
+		posx = Config.RanchAnimals[i].x
+		posy = Config.RanchAnimals[i].y
+		posz = Config.RanchAnimals[i].z
+		posh = Config.RanchAnimals[i].h
+		
+		print('id '..id)
+		print('ranchid '..ranchid)
+		print('animal '..animal)
+		print('hash '..hash)
+		print('borntime '..borntime)
+		print('posx '..posx)
+		print('posy '..posy)
+		print('posz '..posz)
+		print('posh '..posh)
+	end
+
+end)
+--]]
