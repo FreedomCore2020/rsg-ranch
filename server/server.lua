@@ -32,10 +32,29 @@ end
 
 -----------------------------------------------------------------------
 
--- use animal purchase
+-- use animal cow purchase
 RSGCore.Functions.CreateUseableItem("cow", function(source)
     local src = source
     TriggerClientEvent('rsg-ranch:client:newanimal', src, 'cow', `A_C_Cow`)
+end)
+
+-- use animal sheep purchase
+RSGCore.Functions.CreateUseableItem("sheep", function(source)
+    local src = source
+    TriggerClientEvent('rsg-ranch:client:newanimal', src, 'sheep', `a_c_sheep_01`)
+end)
+
+-----------------------------------------------------------------------
+
+-- get all prop data
+RSGCore.Functions.CreateCallback('rsg-ranch:server:getanimaldata', function(source, cb, animalid)
+    MySQL.query('SELECT * FROM ranch_animals WHERE animalid = ?', {animalid}, function(result)
+        if result[1] then
+            cb(result)
+        else
+            cb(nil)
+        end
+    end)
 end)
 
 -----------------------------------------------------------------------
@@ -55,16 +74,16 @@ CreateThread(function()
     AnimalsLoaded = true
 end)
 
--- get props
+-- get animals
 RegisterServerEvent('rsg-gangcamp:server:getAnimals')
 AddEventHandler('rsg-gangcamp:server:getAnimals', function()
-    local result = MySQL.query.await('SELECT * FROM player_ranch')
+    local result = MySQL.query.await('SELECT * FROM ranch_animals')
 
     if not result[1] then return end
 
     for i = 1, #result do
         local animalData = json.decode(result[i].animals)
-        print('loading '..animalData.animal..' prop with ID: '..animalData.id)
+        print('loading '..animalData.animal..' with ID: '..animalData.id)
         table.insert(Config.RanchAnimals, animalData)
     end
 end)
@@ -82,6 +101,7 @@ AddEventHandler('rsg-ranch:server:newanimal', function(animal, pos, heading, has
         id = animalid,
         animal = animal,
         health = 100,
+		product = 0,
         x = pos.x,
         y = pos.y,
         z = pos.z,
@@ -105,19 +125,20 @@ AddEventHandler('rsg-ranch:server:newanimal', function(animal, pos, heading, has
         table.insert(Config.RanchAnimals, AnimalData)
         Player.Functions.RemoveItem(animal, 1)
         TriggerClientEvent('inventory:client:ItemBox', src, RSGCore.Shared.Items[animal], "remove")
-        TriggerEvent('rsg-ranch:server:saveAnimal', AnimalData, playerjob)
+        TriggerEvent('rsg-ranch:server:saveAnimal', AnimalData, playerjob, animalid)
         TriggerEvent('rsg-ranch:server:updateAnimals')
     end
 end)
 
 RegisterServerEvent('rsg-ranch:server:saveAnimal')
-AddEventHandler('rsg-ranch:server:saveAnimal', function(AnimalData, playerjob)
+AddEventHandler('rsg-ranch:server:saveAnimal', function(AnimalData, playerjob, animalid)
     local datas = json.encode(AnimalData)
 
-    MySQL.Async.execute('INSERT INTO player_ranch (animals, ranchid) VALUES (@animals, @ranchid)',
+    MySQL.Async.execute('INSERT INTO ranch_animals (animals, ranchid, animalid) VALUES (@animals, @ranchid, @animalid)',
     {
         ['@animals'] = datas,
         ['@ranchid'] = playerjob,
+        ['@animalid'] = animalid,
     })
 end)
 
@@ -127,49 +148,93 @@ AddEventHandler('rsg-ranch:server:updateAnimals', function()
     TriggerClientEvent('rsg-ranch:client:updateAnimalData', src, Config.RanchAnimals)
 end)
 
---[[
+-- feed animal
+RegisterNetEvent('rsg-ranch:server:feedanimal', function(animalid, animalhealth, animaltype)
+    local src = source
+    local Player = RSGCore.Functions.GetPlayer(src)
+    local result = MySQL.query.await('SELECT * FROM ranch_animals WHERE animalid = ?', {animalid})
+    
+    for i = 1, #result do
+        local id = result[i].id
+        local animalData = json.decode(result[i].animals)
+        -- update animal health
+        local healthadjust = (animalData.health + Config.AnimalFeedAdd)
+        animalData.health = healthadjust
+        MySQL.update("UPDATE ranch_animals SET `animals` = ? WHERE `id` = ?", {json.encode(animalData), id})
+        Player.Functions.RemoveItem('animalfeed', 1)
+        TriggerClientEvent('inventory:client:ItemBox', src, RSGCore.Shared.Items['animalfeed'], "remove")
+        RSGCore.Functions.Notify(src, 'animal feed', 'primary')
+    end
+end)
+
+-- colect product from animal
+RegisterNetEvent('rsg-ranch:server:colectproduct', function(animalid, product, animaltype)
+    local src = source
+    local Player = RSGCore.Functions.GetPlayer(src)
+    local result = MySQL.query.await('SELECT * FROM ranch_animals WHERE animalid = ?', {animalid})
+    
+    for i = 1, #result do
+        local id = result[i].id
+        local animalData = json.decode(result[i].animals)
+        -- reset animal product
+        animalData.product = 0
+        MySQL.update("UPDATE ranch_animals SET `animals` = ? WHERE `id` = ?", {json.encode(animalData), id})
+        if animaltype == 'cow' then
+            Player.Functions.AddItem('milk', 1)
+            TriggerClientEvent('inventory:client:ItemBox', src, RSGCore.Shared.Items['milk'], "add")
+            RSGCore.Functions.Notify(src, 'your cow produced some milk', 'primary')
+        end
+        if animaltype == 'sheep' then
+            Player.Functions.AddItem('wool', 1)
+            TriggerClientEvent('inventory:client:ItemBox', src, RSGCore.Shared.Items['wool'], "add")
+            RSGCore.Functions.Notify(src, 'your sheep produced some wool', 'primary')
+        end
+    end
+end)
+
 --------------------------------------------------------------------------------------------------
--- gangcamp upkeep system
+-- ranch upkeep system
 --------------------------------------------------------------------------------------------------
 UpkeepInterval = function()
-    local result = MySQL.query.await('SELECT * FROM player_ranch')
+    local result = MySQL.query.await('SELECT * FROM ranch_animals')
 
     if not result then goto continue end
 
     for i = 1, #result do
+        local id = result[i].id
         local animalData = json.decode(result[i].animals)
-        if animalData.health >= 1 then
-        
-            local healthadjust = (animalData.health - 1)
-            local id = animalData.id
-            MySQL.update('UPDATE player_ranch SET credit = ? WHERE propid = ?', { creditadjust, row.propid })
-            MySQL.Async.execute("UPDATE players SET `animals` = ? WHERE `id`= ? AND `license`= ?", {json.encode(Charinfo), citizenid, license})
+
+        if animalData.health > 1 then
+            -- update animal health
+            local healthadjust = (animalData.health - Config.HealthRemovePerCycle)
+            animalData.health = healthadjust
+            MySQL.update("UPDATE ranch_animals SET `animals` = ? WHERE `id` = ?", {json.encode(animalData), id})
         else
-            MySQL.update('DELETE FROM player_props WHERE propid = ?', {row.propid})
-
-            if Config.PurgeStorage then
-                MySQL.update('DELETE FROM stashitems WHERE stash = ?', { 'gang_'..row.gang })
-            end
-            
-            if Config.ServerNotify == true then
-                print('object with the id of '..row.propid..' owned by the gang '..row.gang.. ' was deleted')
-            end
-
-            TriggerEvent('rsg-log:server:CreateLog', 'gangmenu', 'Gang Object Lost', 'red', row.gang..' prop with ID: '..row.propid..' has been lost due to non maintenance!')
+            print('animal '..animalData.animal..' with the id of '..animalData.id..' owned by ranch '..animalData.ranchid..' died!')
+            MySQL.update('DELETE FROM ranch_animals WHERE id = ?', {id})
+            --TriggerEvent('rsg-log:server:CreateLog', 'ranch', 'Ranch Animal Died', 'red', 'animal '..animalData.animal..' with the id of '..animalData.id..' owned by ranch '..animalData.ranchid.. ' died!')
         end
+        
+        if animalData.product < 100 then
+            -- update animal product
+            local productadjust = (animalData.product + Config.ProductAddPerCycle)
+            animalData.product = productadjust
+            MySQL.update("UPDATE ranch_animals SET `animals` = ? WHERE `id` = ?", {json.encode(animalData), id})
+        end
+        
     end
 
     ::continue::
+    
+    TriggerEvent('rsg-ranch:server:updateAnimals')
+    print('animal check cycle complete')
 
-    print('gangcamp upkeep cycle complete')
-
-    SetTimeout(Config.BillingCycle * (60 * 60 * 1000), UpkeepInterval) -- hours
-    --SetTimeout(Config.BillingCycle * (60 * 1000), UpkeepInterval) -- mins (for testing)
+    --SetTimeout(Config.CheckCycle * (60 * 60 * 1000), UpkeepInterval) -- hours
+    SetTimeout(Config.CheckCycle * (60 * 1000), UpkeepInterval) -- mins (for testing)
 end
 
-SetTimeout(Config.BillingCycle * (60 * 60 * 1000), UpkeepInterval) -- hours
---SetTimeout(Config.BillingCycle * (60 * 1000), UpkeepInterval) -- mins (for testing)
---]]
+--SetTimeout(Config.CheckCycle * (60 * 60 * 1000), UpkeepInterval) -- hours
+SetTimeout(Config.CheckCycle * (60 * 1000), UpkeepInterval) -- mins (for testing)
 
 --------------------------------------------------------------------------------------------------
 -- start version check

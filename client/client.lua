@@ -39,10 +39,10 @@ RegisterNetEvent('rsg-ranch:client:mainmenu', function(job)
                     arrow = true
                 },
                 {
-                    title = 'Test Output',
-                    description = 'access boss menu',
-                    icon = 'fa-solid fa-hat-cowboy',
-                    event = 'rsg-ranch:client:testoutput',
+                    title = 'Ranch Shop',
+                    description = 'buy livestock and feed',
+                    icon = 'fa-solid fa-basket-shopping',
+                    event = 'rsg-ranch:client:openranchshop',
                     arrow = true
                 },
             }
@@ -149,15 +149,11 @@ Citizen.CreateThread(function()
                 options = {
                     {
                         type = "client",
-                        event = 'rsg-ranch:client:testtarget',
+                        event = 'rsg-ranch:client:animalinfo',
                         id = Config.RanchAnimals[i].id,
-                        ranchid = Config.RanchAnimals[i].ranchid,
-                        animal = Config.RanchAnimals[i].animal,
-                        hash = Config.RanchAnimals[i].hash,
-                        borntime = Config.RanchAnimals[i].borntime,
                         icon = "far fa-eye",
                         label = 'Check Animal',
-                        distance = 3.0
+                        distance = 5.0
                     }
                 }
             })
@@ -171,9 +167,95 @@ Citizen.CreateThread(function()
     end
 end)
 
-RegisterNetEvent('rsg-ranch:client:testtarget', function(data)
-    print(data.id, data.ranchid, data.animal, data.borntime)
+RegisterNetEvent('rsg-ranch:client:animalinfo', function(data)
+    RSGCore.Functions.TriggerCallback('rsg-ranch:server:getanimaldata', function(result)
+        local animals = json.decode(result[1].animals)
+        --print(animals.animal)
+        lib.registerContext({
+            id = 'ranch_animalinfo',
+            title = 'Animal Info',
+            options = {
+                {
+                    title = 'ID: '..animals.id,
+                    description = animals.animal..' id',
+                    icon = 'fa-solid fa-fingerprint',
+                },
+                {
+                    title = 'Health: '..animals.health,
+                    progress = animals.health,
+                    colorScheme = 'green',
+                    description = animals.animal..' health',
+                    icon = 'fa-solid fa-heart-pulse',
+                },
+                {
+                    title = 'Product: '..animals.product,
+                    progress = animals.product,
+                    colorScheme = 'green',
+                    description = animals.animal..' product progress',
+                    icon = 'fa-solid fa-bars-progress',
+                },
+                {
+                    title = 'Feed Animal',
+                    description = 'feed animal to improve health',
+                    icon = 'fa-solid fa-wheat-awn',
+                    event = 'rsg-ranch:client:feedanimal',
+                    args = {
+                        animalid = animals.id,
+                        animalhealth = animals.health,
+                        animaltype = animals.animal
+                    },
+                    arrow = true
+                },
+                {
+                    title = 'Colect Product',
+                    description = 'collect product from animal',
+                    icon = 'fa-solid fa-wheat-awn',
+                    event = 'rsg-ranch:client:collectproduct',
+                    args = {
+                        animalid = animals.id,
+                        animalproduct = animals.product,
+                        animaltype = animals.animal
+                    },
+                    arrow = true
+                },
+            }
+        })
+        lib.showContext('ranch_animalinfo')
+    end, data.id)
 end)
+
+-- feed animal / improve health
+RegisterNetEvent('rsg-ranch:client:feedanimal', function(data)
+    if data.animalhealth <= 100 then
+        TriggerServerEvent('rsg-ranch:server:feedanimal', data.animalid, data.animalhealth, data.animaltype)
+    else
+        RSGCore.Functions.Notify('animal does not require any food!', 'error', 5000)
+    end
+end)
+
+-- collect product
+RegisterNetEvent('rsg-ranch:client:collectproduct', function(data)
+    if data.animalproduct >= 100 then
+        TriggerServerEvent('rsg-ranch:server:collectproduct', data.animalid, data.product, data.animaltype)
+    else
+        RSGCore.Functions.Notify('product not ready to collect yet!', 'error', 5000)
+    end
+end)
+
+-------------------------------------------------------------------------------
+
+RegisterNetEvent('rsg-ranch:client:openranchshop')
+AddEventHandler('rsg-ranch:client:openranchshop', function()
+
+    local ShopItems = {}
+
+    ShopItems.label = 'Ranch Shop'
+    ShopItems.items = Config.RanchShop
+    ShopItems.slots = #Config.RanchShop
+    TriggerServerEvent("inventory:server:OpenInventory", "shop", "RanchShop_"..math.random(1, 99), ShopItems)
+end)
+
+-------------------------------------------------------------------------------
 
 AddEventHandler('onResourceStop', function(resource)
     if resource ~= GetCurrentResourceName() then return end
@@ -187,7 +269,9 @@ AddEventHandler('onResourceStop', function(resource)
     end
 end)
 
-
+-------------------------------------------------------------
+-- testing stuff
+-------------------------------------------------------------
 
 --[[
 RegisterNetEvent('rsg-ranch:client:testoutput', function()
@@ -197,7 +281,9 @@ RegisterNetEvent('rsg-ranch:client:testoutput', function()
         ranchid = Config.RanchAnimals[i].ranchid
         animal = Config.RanchAnimals[i].animal
         hash = Config.RanchAnimals[i].hash
-        borntime = Config.RanchAnimals[i].borntime
+        borntime = Config.RanchAnimals[i].born
+        health = Config.RanchAnimals[i].health
+        product = Config.RanchAnimals[i].product
         posx = Config.RanchAnimals[i].x
         posy = Config.RanchAnimals[i].y
         posz = Config.RanchAnimals[i].z
@@ -208,6 +294,8 @@ RegisterNetEvent('rsg-ranch:client:testoutput', function()
         print('animal '..animal)
         print('hash '..hash)
         print('borntime '..borntime)
+        print('health '..health)
+        print('product '..product)
         print('posx '..posx)
         print('posy '..posy)
         print('posz '..posz)

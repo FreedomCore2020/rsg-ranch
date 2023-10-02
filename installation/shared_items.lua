@@ -1,0 +1,6 @@
+    -- ranch items
+    ['cow']        = {['name'] = 'cow',   ['label'] = 'Cow',         ['weight'] = 100, ['type'] = 'item', ['image'] = 'cow.png',        ['unique'] = false, ['useable'] = true,  ['shouldClose'] = true, ['combinable'] = nil, ['level'] = 0, ['description'] = 'ranch'},
+    ['sheep']      = {['name'] = 'sheep', ['label'] = 'Sheep',       ['weight'] = 100, ['type'] = 'item', ['image'] = 'sheep.png',      ['unique'] = false, ['useable'] = true,  ['shouldClose'] = true, ['combinable'] = nil, ['level'] = 0, ['description'] = 'ranch'},
+    ['animalfeed'] = {['name'] = 'sheep', ['label'] = 'Animal Feed', ['weight'] = 100, ['type'] = 'item', ['image'] = 'animalfeed.png', ['unique'] = false, ['useable'] = true,  ['shouldClose'] = true, ['combinable'] = nil, ['level'] = 0, ['description'] = 'ranch'},
+    ['milk']       = {['name'] = 'milk',  ['label'] = 'Milk',        ['weight'] = 100, ['type'] = 'item', ['image'] = 'milk.png',       ['unique'] = false, ['useable'] = true,  ['shouldClose'] = true, ['combinable'] = nil, ['level'] = 0, ['description'] = 'ranch'},
+    ['wool']       = {['name'] = 'wool',  ['label'] = 'Wool',        ['weight'] = 100, ['type'] = 'item', ['image'] = 'wool.png',       ['unique'] = false, ['useable'] = true,  ['shouldClose'] = true, ['combinable'] = nil, ['level'] = 0, ['description'] = 'ranch'},
