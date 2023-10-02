@@ -10,6 +10,8 @@
 # Installation
 - ensure that the dependancies are added and started
 - add the following table to your database : rsg-ranch.sql
+- add items to your "\rsg-core\shared\items.lua"
+- add images to your "\rsg-inventory\html\images"
 - add rsg-ranch to your resources folder
 
 # add to shared jobs
