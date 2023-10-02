@@ -236,7 +236,7 @@ end)
 -- collect product
 RegisterNetEvent('rsg-ranch:client:collectproduct', function(data)
     if data.animalproduct >= 100 then
-        TriggerServerEvent('rsg-ranch:server:collectproduct', data.animalid, data.product, data.animaltype)
+        TriggerServerEvent('rsg-ranch:server:collectproduct', data.animalid, data.animalproduct, data.animaltype)
     else
         RSGCore.Functions.Notify('product not ready to collect yet!', 'error', 5000)
     end

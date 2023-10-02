@@ -168,11 +168,12 @@ RegisterNetEvent('rsg-ranch:server:feedanimal', function(animalid, animalhealth,
 end)
 
 -- colect product from animal
-RegisterNetEvent('rsg-ranch:server:colectproduct', function(animalid, product, animaltype)
+RegisterNetEvent('rsg-ranch:server:collectproduct', function(animalid, product, animaltype)
     local src = source
     local Player = RSGCore.Functions.GetPlayer(src)
+
     local result = MySQL.query.await('SELECT * FROM ranch_animals WHERE animalid = ?', {animalid})
-    
+
     for i = 1, #result do
         local id = result[i].id
         local animalData = json.decode(result[i].animals)
@@ -190,6 +191,7 @@ RegisterNetEvent('rsg-ranch:server:colectproduct', function(animalid, product, a
             RSGCore.Functions.Notify(src, 'your sheep produced some wool', 'primary')
         end
     end
+
 end)
 
 --------------------------------------------------------------------------------------------------
