@@ -1,6 +1,7 @@
 local RSGCore = exports['rsg-core']:GetCoreObject()
 local SpawnedAnimals = {}
 local isBusy = false
+local isFollowing = false
 
 -------------------------------------------------------------------------------------------
 -- prompts and blips
@@ -154,6 +155,14 @@ Citizen.CreateThread(function()
                         icon = "far fa-eye",
                         label = 'Check Animal',
                         distance = 5.0
+                    },
+                    {
+                        type = "client",
+                        event = 'rsg-ranch:client:animalfollow',
+                        entity = data.obj,
+                        icon = "far fa-eye",
+                        label = 'Follow/Unfollow',
+                        distance = 8.0
                     }
                 }
             })
@@ -251,6 +260,27 @@ Citizen.CreateThread(function()
             TriggerServerEvent('rsg-ranch:server:updateposition', animalid, pos.x, pos.y, pos.z)
         end
         Wait(5000)
+    end
+end)
+
+-- set animal to follow you
+RegisterNetEvent('rsg-ranch:client:animalfollow')
+AddEventHandler('rsg-ranch:client:animalfollow', function(data)
+    if IsPedDeadOrDying(data.entity, true) then
+        lib.notify({ title = 'Animal Dead', description = 'this animal is dead!', type = 'error' })
+        return 
+    end
+    if isFollowing == false then
+        isFollowing = true
+        local player = PlayerPedId()
+        local playerCoords = GetEntityCoords(player)
+        local animalOffset = vector3(0.0, 2.0, 0.0) 
+        ClearPedTasks(data.entity)
+        TaskFollowToOffsetOfEntity(data.entity, player, animalOffset.x, animalOffset.y, animalOffset.z, 1.0, -1, 0.0, 1)
+    else
+        isFollowing = false
+        local x,y,z = table.unpack(GetEntityCoords(data.entity))
+        Citizen.InvokeNative(0xE054346CA3A0F315, data.entity, x, y, z, 50.0, tonumber(1077936128), tonumber(1086324736), 1)
     end
 end)
 
