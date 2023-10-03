@@ -218,6 +218,13 @@ RegisterNetEvent('rsg-ranch:server:updateposition', function(animalid, posx, pos
     ::continue::
 end)
 
+-- if animal is killed it will be removed from the database
+RegisterServerEvent('rsg-ranch:server:animalkilled')
+AddEventHandler('rsg-ranch:server:animalkilled', function(animalid)
+    MySQL.update('DELETE FROM ranch_animals WHERE animalid = ?', {animalid})
+    TriggerEvent('rsg-log:server:CreateLog', 'ranch', 'Ranch Animal Killed', 'red', 'animal with the branding id of '..animalid..' was killed!')
+end)
+
 --------------------------------------------------------------------------------------------------
 -- ranch upkeep system
 --------------------------------------------------------------------------------------------------

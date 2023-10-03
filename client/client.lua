@@ -250,14 +250,18 @@ RegisterNetEvent('rsg-ranch:client:collectproduct', function(data)
     end
 end)
 
--- set new animal position
+-- set new animal position and handle animal being killed
 Citizen.CreateThread(function()
     while true do
         for i = 1, #SpawnedAnimals do
             local animals = SpawnedAnimals[i].obj
             local animalid = SpawnedAnimals[i].id
             local pos = GetEntityCoords(animals)
-            TriggerServerEvent('rsg-ranch:server:updateposition', animalid, pos.x, pos.y, pos.z)
+            if IsPedDeadOrDying(animals, true) then
+                TriggerServerEvent('rsg-ranch:server:animalkilled', animalid)
+            else
+                TriggerServerEvent('rsg-ranch:server:updateposition', animalid, pos.x, pos.y, pos.z)
+            end
         end
         Wait(5000)
     end
