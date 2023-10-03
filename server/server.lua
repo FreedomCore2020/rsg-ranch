@@ -101,7 +101,7 @@ AddEventHandler('rsg-ranch:server:newanimal', function(animal, pos, heading, has
         id = animalid,
         animal = animal,
         health = 100,
-		product = 0,
+        product = 0,
         x = pos.x,
         y = pos.y,
         z = pos.z,
@@ -120,7 +120,9 @@ AddEventHandler('rsg-ranch:server:newanimal', function(animal, pos, heading, has
     end
 
     if AnimalCount >= Config.MaxAnimalCount then
-        TriggerClientEvent('RSGCore:Notify', src, 'you have the maximum animals alowed!', 'error')
+    
+        TriggerClientEvent('ox_lib:notify', src, {title = 'Maximum Animals', description = 'you have the maximum animals alowed!', type = 'inform' })
+        
     else
         table.insert(Config.RanchAnimals, AnimalData)
         Player.Functions.RemoveItem(animal, 1)
@@ -163,7 +165,7 @@ RegisterNetEvent('rsg-ranch:server:feedanimal', function(animalid, animalhealth,
         MySQL.update("UPDATE ranch_animals SET `animals` = ? WHERE `id` = ?", {json.encode(animalData), id})
         Player.Functions.RemoveItem('animalfeed', 1)
         TriggerClientEvent('inventory:client:ItemBox', src, RSGCore.Shared.Items['animalfeed'], "remove")
-        RSGCore.Functions.Notify(src, 'animal feed', 'primary')
+        TriggerClientEvent('ox_lib:notify', src, {title = 'Animals Fed', description = 'animal feeding was successful!', type = 'inform' })
     end
 end)
 
@@ -183,12 +185,12 @@ RegisterNetEvent('rsg-ranch:server:collectproduct', function(animalid, product, 
         if animaltype == 'cow' then
             Player.Functions.AddItem('milk', 1)
             TriggerClientEvent('inventory:client:ItemBox', src, RSGCore.Shared.Items['milk'], "add")
-            RSGCore.Functions.Notify(src, 'your cow produced some milk', 'primary')
+            TriggerClientEvent('ox_lib:notify', src, {title = 'Milk Produced', description = 'your cow produced some milk!', type = 'inform' })
         end
         if animaltype == 'sheep' then
             Player.Functions.AddItem('wool', 1)
             TriggerClientEvent('inventory:client:ItemBox', src, RSGCore.Shared.Items['wool'], "add")
-            RSGCore.Functions.Notify(src, 'your sheep produced some wool', 'primary')
+            TriggerClientEvent('ox_lib:notify', src, {title = 'Wool Produced', description = 'your sheep produced some wool!', type = 'inform' })
         end
     end
 
@@ -236,7 +238,7 @@ UpkeepInterval = function()
         else
             print('animal '..animalData.animal..' with the id of '..animalData.id..' owned by ranch '..animalData.ranchid..' died!')
             MySQL.update('DELETE FROM ranch_animals WHERE id = ?', {id})
-            --TriggerEvent('rsg-log:server:CreateLog', 'ranch', 'Ranch Animal Died', 'red', 'animal '..animalData.animal..' with the id of '..animalData.id..' owned by ranch '..animalData.ranchid.. ' died!')
+            TriggerEvent('rsg-log:server:CreateLog', 'ranch', 'Ranch Animal Died', 'red', 'animal '..animalData.animal..' with the id of '..animalData.id..' owned by ranch '..animalData.ranchid.. ' died!')
         end
         
         if animalData.product < 100 then
@@ -253,12 +255,10 @@ UpkeepInterval = function()
     TriggerEvent('rsg-ranch:server:updateAnimals')
     print('animal check cycle complete')
 
-    --SetTimeout(Config.CheckCycle * (60 * 60 * 1000), UpkeepInterval) -- hours
-    SetTimeout(Config.CheckCycle * (60 * 1000), UpkeepInterval) -- mins (for testing)
+    SetTimeout(Config.CheckCycle * (60 * 1000), UpkeepInterval)
 end
 
---SetTimeout(Config.CheckCycle * (60 * 60 * 1000), UpkeepInterval) -- hours
-SetTimeout(Config.CheckCycle * (60 * 1000), UpkeepInterval) -- mins (for testing)
+SetTimeout(Config.CheckCycle * (60 * 1000), UpkeepInterval)
 
 --------------------------------------------------------------------------------------------------
 -- start version check

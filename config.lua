@@ -6,7 +6,7 @@ Config.Keybind = 'J'
 Config.MaxAnimalCount = 50
 Config.HealthRemovePerCycle = 1
 Config.ProductAddPerCycle = 1
-Config.CheckCycle = 1
+Config.CheckCycle = 1 -- minutes it waits until it does an update
 Config.AnimalFeedAdd = 10
 
 -- authorised jobs

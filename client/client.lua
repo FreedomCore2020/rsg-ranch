@@ -49,7 +49,7 @@ RegisterNetEvent('rsg-ranch:client:mainmenu', function(job)
         })
         lib.showContext('ranch_mainmenu')
     else
-        RSGCore.Functions.Notify('no access!', 'error')
+        lib.notify({ title = 'Access Error', description = 'you don\'t have access to this!', type = 'error' })
     end
 end)
 
@@ -61,7 +61,7 @@ AddEventHandler('rsg-ranch:client:newanimal', function(animal, hash)
 
     for i, v in ipairs(Config.AuthorisedJobs) do
         if v ~= playerjob then
-            RSGCore.Functions.Notify('you are not a rancher!', 'error', 5000)
+            lib.notify({ title = 'Not Allowed', description = 'only rancher\'s are able to do this!', type = 'error' })
             return
         end
     end
@@ -84,7 +84,7 @@ AddEventHandler('rsg-ranch:client:newanimal', function(animal, hash)
         return
     end
 
-    RSGCore.Functions.Notify('can\'t place it while in a vehicle!', 'error', 5000)
+    lib.notify({ title = 'Problem', description = 'can\'t place it while in a vehicle!', type = 'error' })
 
     Wait(3000)
 end)
@@ -170,7 +170,6 @@ end)
 RegisterNetEvent('rsg-ranch:client:animalinfo', function(data)
     RSGCore.Functions.TriggerCallback('rsg-ranch:server:getanimaldata', function(result)
         local animals = json.decode(result[1].animals)
-        --print(animals.animal)
         lib.registerContext({
             id = 'ranch_animalinfo',
             title = 'Animal Info',
@@ -229,7 +228,7 @@ RegisterNetEvent('rsg-ranch:client:feedanimal', function(data)
     if data.animalhealth <= 100 then
         TriggerServerEvent('rsg-ranch:server:feedanimal', data.animalid, data.animalhealth, data.animaltype)
     else
-        RSGCore.Functions.Notify('animal does not require any food!', 'error', 5000)
+        lib.notify({ title = 'Animal Full', description = 'animal does not require any food!', type = 'inform' })
     end
 end)
 
@@ -238,7 +237,7 @@ RegisterNetEvent('rsg-ranch:client:collectproduct', function(data)
     if data.animalproduct >= 100 then
         TriggerServerEvent('rsg-ranch:server:collectproduct', data.animalid, data.animalproduct, data.animaltype)
     else
-        RSGCore.Functions.Notify('product not ready to collect yet!', 'error', 5000)
+        lib.notify({ title = 'Product Not Ready', description = 'product not ready to collect yet!', type = 'inform' })
     end
 end)
 
