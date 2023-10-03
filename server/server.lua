@@ -194,6 +194,28 @@ RegisterNetEvent('rsg-ranch:server:collectproduct', function(animalid, product, 
 
 end)
 
+-- update new animal position to database
+RegisterNetEvent('rsg-ranch:server:updateposition', function(animalid, posx, posy, posz)
+
+    local result = MySQL.query.await('SELECT * FROM ranch_animals')
+
+    if not result then goto continue end
+
+    for i = 1, #result do
+        local id = result[i].id
+        local animalData = json.decode(result[i].animals)
+        
+        -- set position
+        animalData.x = posx
+        animalData.y = posy
+        animalData.z = posz
+        
+        MySQL.update("UPDATE ranch_animals SET `animals` = ? WHERE `id` = ?", {json.encode(animalData), id})    
+    end
+
+    ::continue::
+end)
+
 --------------------------------------------------------------------------------------------------
 -- ranch upkeep system
 --------------------------------------------------------------------------------------------------

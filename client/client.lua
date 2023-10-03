@@ -242,6 +242,19 @@ RegisterNetEvent('rsg-ranch:client:collectproduct', function(data)
     end
 end)
 
+-- set new animal position
+Citizen.CreateThread(function()
+    while true do
+        for i = 1, #SpawnedAnimals do
+            local animals = SpawnedAnimals[i].obj
+            local animalid = SpawnedAnimals[i].id
+            local pos = GetEntityCoords(animals)
+            TriggerServerEvent('rsg-ranch:server:updateposition', animalid, pos.x, pos.y, pos.z)
+        end
+        Wait(5000)
+    end
+end)
+
 -------------------------------------------------------------------------------
 
 RegisterNetEvent('rsg-ranch:client:openranchshop')
