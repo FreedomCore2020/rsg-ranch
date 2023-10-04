@@ -236,7 +236,17 @@ UpkeepInterval = function()
     for i = 1, #result do
         local id = result[i].id
         local animalData = json.decode(result[i].animals)
-
+        -- animal age workings
+        local borntime = animalData.borntime
+        local daysfrom = os.difftime(os.time(), borntime) / (24 * 60 * 60) -- seconds in a day
+        local animalage = math.floor(daysfrom)
+        
+        if animalage == Config.AnimalDieAge then
+            MySQL.update('DELETE FROM ranch_animals WHERE id = ?', {id})
+            TriggerEvent('rsg-log:server:CreateLog', 'ranch', 'Ranch Animal Died', 'red', 'animal '..animalData.animal..' with the id of '..animalData.id..' owned by ranch '..animalData.ranchid.. ' died of old age!')
+            goto continue
+        end
+        
         if animalData.health > 1 then
             -- update animal health
             local healthadjust = (animalData.health - Config.HealthRemovePerCycle)
