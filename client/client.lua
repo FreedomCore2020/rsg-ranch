@@ -189,6 +189,11 @@ RegisterNetEvent('rsg-ranch:client:animalinfo', function(data)
                     icon = 'fa-solid fa-fingerprint',
                 },
                 {
+                    title = 'Age: '..animals.age,
+                    description = animals.animal..' age',
+                    icon = 'fa-solid fa-paw',
+                },
+                {
                     title = 'Health: '..animals.health,
                     progress = animals.health,
                     colorScheme = 'green',
