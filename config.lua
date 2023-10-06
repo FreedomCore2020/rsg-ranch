@@ -9,6 +9,7 @@ Config.ProductAddPerCycle = 1
 Config.CheckCycle = 1 -- minutes it waits until it does an update
 Config.AnimalFeedAdd = 10
 Config.AnimalDieAge = 30
+Config.AnimalTargetDistance = 5.0
 
 -- authorised jobs
 Config.AuthorisedJobs = {

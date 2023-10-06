@@ -154,17 +154,16 @@ Citizen.CreateThread(function()
                         id = Config.RanchAnimals[i].id,
                         icon = "far fa-eye",
                         label = 'Check Animal',
-                        distance = 5.0
                     },
                     {
                         type = "client",
                         event = 'rsg-ranch:client:animalfollow',
                         entity = data.obj,
                         icon = "far fa-eye",
-                        label = 'Follow/Unfollow',
-                        distance = 8.0
+                        label = 'Follow Toggle'
                     }
-                }
+                },
+                distance = Config.AnimalTargetDistance
             })
 
             ::continue::
@@ -189,7 +188,7 @@ RegisterNetEvent('rsg-ranch:client:animalinfo', function(data)
                     icon = 'fa-solid fa-fingerprint',
                 },
                 {
-                    title = 'Age: '..animals.age,
+                    title = 'Age: '..tonumber(animals.age),
                     description = animals.animal..' age',
                     icon = 'fa-solid fa-paw',
                 },
