@@ -35,13 +35,13 @@ end
 -- use animal cow purchase
 RSGCore.Functions.CreateUseableItem("cow", function(source)
     local src = source
-    TriggerClientEvent('rsg-ranch:client:newanimal', src, 'cow', `A_C_Cow`)
+    TriggerClientEvent('rsg-ranch:client:newanimal', src, 'cow', `A_C_Cow`, 'milk')
 end)
 
 -- use animal sheep purchase
 RSGCore.Functions.CreateUseableItem("sheep", function(source)
     local src = source
-    TriggerClientEvent('rsg-ranch:client:newanimal', src, 'sheep', `a_c_sheep_01`)
+    TriggerClientEvent('rsg-ranch:client:newanimal', src, 'sheep', `a_c_sheep_01`, 'wool')
 end)
 
 -----------------------------------------------------------------------
@@ -92,7 +92,7 @@ end)
 
 -- new prop
 RegisterServerEvent('rsg-ranch:server:newanimal')
-AddEventHandler('rsg-ranch:server:newanimal', function(animal, pos, heading, hash, playerjob)
+AddEventHandler('rsg-ranch:server:newanimal', function(animal, pos, heading, hash, playerjob, product)
     local src = source
     local Player = RSGCore.Functions.GetPlayer(src)
     local animalid = math.random(111111, 999999)
@@ -102,6 +102,7 @@ AddEventHandler('rsg-ranch:server:newanimal', function(animal, pos, heading, has
         animal = animal,
         health = 100,
         product = 0,
+        productoutput = product,
         x = pos.x,
         y = pos.y,
         z = pos.z,
@@ -170,7 +171,7 @@ RegisterNetEvent('rsg-ranch:server:feedanimal', function(animalid, animalhealth,
 end)
 
 -- colect product from animal
-RegisterNetEvent('rsg-ranch:server:collectproduct', function(animalid, product, animaltype)
+RegisterNetEvent('rsg-ranch:server:collectproduct', function(ranchid, animalid, animalproduct, animalproductoutput, animaltype)
     local src = source
     local Player = RSGCore.Functions.GetPlayer(src)
 
@@ -182,16 +183,19 @@ RegisterNetEvent('rsg-ranch:server:collectproduct', function(animalid, product, 
         -- reset animal product
         animalData.product = 0
         MySQL.update("UPDATE ranch_animals SET `animals` = ? WHERE `id` = ?", {json.encode(animalData), id})
-        if animaltype == 'cow' then
-            Player.Functions.AddItem('milk', 1)
-            TriggerClientEvent('inventory:client:ItemBox', src, RSGCore.Shared.Items['milk'], "add")
-            TriggerClientEvent('ox_lib:notify', src, {title = 'Milk Produced', description = 'your cow produced some milk!', type = 'inform' })
-        end
-        if animaltype == 'sheep' then
-            Player.Functions.AddItem('wool', 1)
-            TriggerClientEvent('inventory:client:ItemBox', src, RSGCore.Shared.Items['wool'], "add")
-            TriggerClientEvent('ox_lib:notify', src, {title = 'Wool Produced', description = 'your sheep produced some wool!', type = 'inform' })
-        end
+        
+        -- add stock to ranch
+        local giveamount = 1
+        
+        MySQL.query('SELECT * FROM ranch_stock WHERE jobaccess = ? AND item = ?',{ranchid, animalproductoutput} , function(result)
+            if result[1] ~= nil then
+                local stockadd = result[1].stock + giveamount
+                MySQL.update('UPDATE ranch_stock SET stock = ? WHERE jobaccess = ? AND item = ?',{stockadd, ranchid, animalproductoutput})
+                TriggerClientEvent('ox_lib:notify', src, {title = 'Stock Added', description = animalproductoutput..' has been added to your stock', type = 'inform' })
+            else
+                MySQL.insert('INSERT INTO ranch_stock (`jobaccess`, `item`, `stock`) VALUES (?, ?, ?);', {ranchid, animalproductoutput, giveamount})
+            end
+        end)
     end
 
 end)

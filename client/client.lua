@@ -39,13 +39,6 @@ RegisterNetEvent('rsg-ranch:client:mainmenu', function(job)
                     event = 'rsg-bossmenu:client:mainmenu',
                     arrow = true
                 },
-                {
-                    title = 'Ranch Shop',
-                    description = 'buy livestock and feed',
-                    icon = 'fa-solid fa-basket-shopping',
-                    event = 'rsg-ranch:client:openranchshop',
-                    arrow = true
-                },
             }
         })
         lib.showContext('ranch_mainmenu')
@@ -56,7 +49,7 @@ end)
 
 -- new animal deploy
 RegisterNetEvent('rsg-ranch:client:newanimal')
-AddEventHandler('rsg-ranch:client:newanimal', function(animal, hash)
+AddEventHandler('rsg-ranch:client:newanimal', function(animal, hash, product)
     local PlayerData = RSGCore.Functions.GetPlayerData()
     local playerjob = PlayerData.job.name
 
@@ -80,7 +73,7 @@ AddEventHandler('rsg-ranch:client:newanimal', function(animal, hash)
         ClearPedTasks(ped)
         FreezeEntityPosition(ped, false)
         --print(animal, pos, heading, hash, playerjob)
-        TriggerServerEvent('rsg-ranch:server:newanimal', animal, pos, heading, hash, playerjob)
+        TriggerServerEvent('rsg-ranch:server:newanimal', animal, pos, heading, hash, playerjob, product)
         isBusy = false
         return
     end
@@ -200,10 +193,10 @@ RegisterNetEvent('rsg-ranch:client:animalinfo', function(data)
                     icon = 'fa-solid fa-heart-pulse',
                 },
                 {
-                    title = 'Product: '..animals.product,
+                    title = 'Product Progress : '..animals.product,
                     progress = animals.product,
                     colorScheme = 'green',
-                    description = animals.animal..' product progress',
+                    description = animals.animal..' '..animals.productoutput..' production in progress',
                     icon = 'fa-solid fa-bars-progress',
                 },
                 {
@@ -224,8 +217,10 @@ RegisterNetEvent('rsg-ranch:client:animalinfo', function(data)
                     icon = 'fa-solid fa-wheat-awn',
                     event = 'rsg-ranch:client:collectproduct',
                     args = {
-                        animalid = animals.id,
+                        ranchid = animals.ranchid,
+						animalid = animals.id,
                         animalproduct = animals.product,
+						animalproductoutput = animals.productoutput,
                         animaltype = animals.animal
                     },
                     arrow = true
@@ -248,7 +243,7 @@ end)
 -- collect product
 RegisterNetEvent('rsg-ranch:client:collectproduct', function(data)
     if data.animalproduct >= 100 then
-        TriggerServerEvent('rsg-ranch:server:collectproduct', data.animalid, data.animalproduct, data.animaltype)
+        TriggerServerEvent('rsg-ranch:server:collectproduct', data.ranchid, data.animalid, data.animalproduct, data.animalproductoutput, data.animaltype)
     else
         lib.notify({ title = 'Product Not Ready', description = 'product not ready to collect yet!', type = 'inform' })
     end
@@ -290,19 +285,6 @@ AddEventHandler('rsg-ranch:client:animalfollow', function(data)
         local x,y,z = table.unpack(GetEntityCoords(data.entity))
         Citizen.InvokeNative(0xE054346CA3A0F315, data.entity, x, y, z, 50.0, tonumber(1077936128), tonumber(1086324736), 1)
     end
-end)
-
--------------------------------------------------------------------------------
-
-RegisterNetEvent('rsg-ranch:client:openranchshop')
-AddEventHandler('rsg-ranch:client:openranchshop', function()
-
-    local ShopItems = {}
-
-    ShopItems.label = 'Ranch Shop'
-    ShopItems.items = Config.RanchShop
-    ShopItems.slots = #Config.RanchShop
-    TriggerServerEvent("inventory:server:OpenInventory", "shop", "RanchShop_"..math.random(1, 99), ShopItems)
 end)
 
 -------------------------------------------------------------------------------

@@ -16,11 +16,18 @@ Config.AuthorisedJobs = {
     'macfarranch',
 }
 
--- blacksmith blip settings
+-- ranch blip settings
 Config.RanchBlip = {
     blipName   = 'Ranch', -- Config.Blip.blipName
     blipSprite = 'blip_ambient_herd', -- Config.Blip.blipSprite
     blipScale  = 0.2 -- Config.Blip.blipScale
+}
+
+-- ranch shop blip settings
+Config.RanchShopBlip = {
+    blipName = 'Ranch Shop', -- Config.Blip.blipName
+    blipSprite = 'blip_shop_store', -- Config.Blip.blipSprite
+    blipScale = 0.2 -- Config.Blip.blipScale
 }
 
 Config.RanchLocations = {
@@ -33,12 +40,19 @@ Config.RanchLocations = {
     },
 }
 
--- ranch shop
-Config.RanchShop = {
-    [1] = { name = "cow",        price = 50, amount = 10,  info = {}, type = "item", slot = 1, },
-    [2] = { name = "sheep",      price = 25, amount = 10,  info = {}, type = "item", slot = 2, },
-    [3] = { name = "animalfeed", price = 1,  amount = 500, info = {}, type = "item", slot = 3, },
+-- ranch shops
+Config.RanchShops = {
+
+    {
+        shopid = 'macfarranchshop',
+        shopname = 'Ranch Shop',
+        coords = vector3(-2367.547, -2387.013, 62.176456),
+        jobaccess = 'macfarranch',
+        showblip = true
+    },
+    
 }
 
 -- npc coords
--- vector4(-2375.171, -2374.125, 62.37881, 194.37658)
+-- vector4(-2375.171, -2374.125, 62.37881, 194.37658) -- boss menu
+-- vector4(-2367.547, -2387.013, 62.176456, 5.2386674) -- ranch shop
