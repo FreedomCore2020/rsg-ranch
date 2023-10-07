@@ -32,21 +32,7 @@ end
 
 -----------------------------------------------------------------------
 
--- use animal cow purchase
-RSGCore.Functions.CreateUseableItem("cow", function(source)
-    local src = source
-    TriggerClientEvent('rsg-ranch:client:newanimal', src, 'cow', `A_C_Cow`, 'milk')
-end)
-
--- use animal sheep purchase
-RSGCore.Functions.CreateUseableItem("sheep", function(source)
-    local src = source
-    TriggerClientEvent('rsg-ranch:client:newanimal', src, 'sheep', `a_c_sheep_01`, 'wool')
-end)
-
------------------------------------------------------------------------
-
--- get all prop data
+-- get all animal data
 RSGCore.Functions.CreateCallback('rsg-ranch:server:getanimaldata', function(source, cb, animalid)
     MySQL.query('SELECT * FROM ranch_animals WHERE animalid = ?', {animalid}, function(result)
         if result[1] then
@@ -90,25 +76,28 @@ end)
 
 -----------------------------------------------------------------------
 
--- new prop
+-- new animal
 RegisterServerEvent('rsg-ranch:server:newanimal')
-AddEventHandler('rsg-ranch:server:newanimal', function(animal, pos, heading, hash, playerjob, product)
-    local src = source
+AddEventHandler('rsg-ranch:server:newanimal', function(data)
+
+    --print(data.animal, data.animalspawn.x, data.animalspawn.y, data.animalspawn.z, data.hash, data.playerjob, data.product, data.cost)
+
+	local src = source
     local Player = RSGCore.Functions.GetPlayer(src)
     local animalid = math.random(111111, 999999)
     local AnimalData =
     {
         id = animalid,
-        animal = animal,
+        animal = data.animal,
         health = 100,
         product = 0,
-        productoutput = product,
-        x = pos.x,
-        y = pos.y,
-        z = pos.z,
-        h = heading,
-        hash = hash,
-        ranchid = playerjob,
+        productoutput = data.product,
+        x = data.animalspawn.x,
+        y = data.animalspawn.y,
+        z = data.animalspawn.z,
+        h = 0,
+        hash = data.hash,
+        ranchid = data.playerjob,
         borntime = os.time()
     }
 
@@ -126,11 +115,11 @@ AddEventHandler('rsg-ranch:server:newanimal', function(animal, pos, heading, has
         
     else
         table.insert(Config.RanchAnimals, AnimalData)
-        Player.Functions.RemoveItem(animal, 1)
-        TriggerClientEvent('inventory:client:ItemBox', src, RSGCore.Shared.Items[animal], "remove")
         TriggerEvent('rsg-ranch:server:saveAnimal', AnimalData, playerjob, animalid)
         TriggerEvent('rsg-ranch:server:updateAnimals')
+        Player.Functions.RemoveMoney('cash', data.cost)
     end
+
 end)
 
 RegisterServerEvent('rsg-ranch:server:saveAnimal')

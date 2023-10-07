@@ -7,7 +7,7 @@ game 'rdr3'
 
 author 'RexShack#3041'
 description 'rsg-ranch'
-version '1.0.9'
+version '1.1.0'
 
 shared_scripts {
     '@ox_lib/init.lua',
@@ -18,7 +18,8 @@ shared_scripts {
 
 client_scripts {
     'client/client.lua',
-    'client/client_shop.lua'
+    'client/client_shop.lua',
+    'client/client_dealer.lua'
 }
 
 server_scripts {

@@ -47,42 +47,6 @@ RegisterNetEvent('rsg-ranch:client:mainmenu', function(job)
     end
 end)
 
--- new animal deploy
-RegisterNetEvent('rsg-ranch:client:newanimal')
-AddEventHandler('rsg-ranch:client:newanimal', function(animal, hash, product)
-    local PlayerData = RSGCore.Functions.GetPlayerData()
-    local playerjob = PlayerData.job.name
-
-    for i, v in ipairs(Config.AuthorisedJobs) do
-        if v ~= playerjob then
-            lib.notify({ title = 'Not Allowed', description = 'only rancher\'s are able to do this!', type = 'error' })
-            return
-        end
-    end
-
-    local pos = GetOffsetFromEntityInWorldCoords(PlayerPedId(), 0.0, 3.0, 0.0)
-    local heading = GetEntityHeading(PlayerPedId())
-    local ped = PlayerPedId()
-
-    if not IsPedInAnyVehicle(PlayerPedId(), false) and not isBusy then
-        isBusy = true
-        local anim1 = `WORLD_HUMAN_CROUCH_INSPECT`
-        FreezeEntityPosition(ped, true)
-        TaskStartScenarioInPlace(ped, anim1, 0, true)
-        Wait(10000)
-        ClearPedTasks(ped)
-        FreezeEntityPosition(ped, false)
-        --print(animal, pos, heading, hash, playerjob)
-        TriggerServerEvent('rsg-ranch:server:newanimal', animal, pos, heading, hash, playerjob, product)
-        isBusy = false
-        return
-    end
-
-    lib.notify({ title = 'Problem', description = 'can\'t place it while in a vehicle!', type = 'error' })
-
-    Wait(3000)
-end)
-
 -- update animals
 RegisterNetEvent('rsg-ranch:client:updateAnimalData')
 AddEventHandler('rsg-ranch:client:updateAnimalData', function(data)
@@ -335,4 +299,41 @@ RegisterNetEvent('rsg-ranch:client:testoutput', function()
     end
 
 end)
+
+-- new animal deploy
+RegisterNetEvent('rsg-ranch:client:newanimal')
+AddEventHandler('rsg-ranch:client:newanimal', function(animal, hash, product, cost)
+    local PlayerData = RSGCore.Functions.GetPlayerData()
+    local playerjob = PlayerData.job.name
+
+    for i, v in ipairs(Config.AuthorisedJobs) do
+        if v ~= playerjob then
+            lib.notify({ title = 'Not Allowed', description = 'only rancher\'s are able to do this!', type = 'error' })
+            return
+        end
+    end
+
+    local pos = GetOffsetFromEntityInWorldCoords(PlayerPedId(), 0.0, 3.0, 0.0)
+    local heading = GetEntityHeading(PlayerPedId())
+    local ped = PlayerPedId()
+
+    if not IsPedInAnyVehicle(PlayerPedId(), false) and not isBusy then
+        isBusy = true
+        local anim1 = `WORLD_HUMAN_CROUCH_INSPECT`
+        FreezeEntityPosition(ped, true)
+        TaskStartScenarioInPlace(ped, anim1, 0, true)
+        Wait(10000)
+        ClearPedTasks(ped)
+        FreezeEntityPosition(ped, false)
+        --print(animal, pos, heading, hash, playerjob)
+        TriggerServerEvent('rsg-ranch:server:newanimal', animal, pos, heading, hash, playerjob, product)
+        isBusy = false
+        return
+    end
+
+    lib.notify({ title = 'Problem', description = 'can\'t place it while in a vehicle!', type = 'error' })
+
+    Wait(3000)
+end)
+
 --]]
