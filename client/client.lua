@@ -92,6 +92,8 @@ Citizen.CreateThread(function()
             
             data.id = Config.RanchAnimals[i].id
             data.obj = CreatePed(modelHash, Config.RanchAnimals[i].x, Config.RanchAnimals[i].y, Config.RanchAnimals[i].z -1.2, true, true, false)
+            data.ranchid = Config.RanchAnimals[i].ranchid
+            data.animal = Config.RanchAnimals[i].animal
             SetEntityHeading(data.obj, Config.RanchAnimals[i].h)
             Citizen.InvokeNative(0x77FF8D35EEC6BBC4, data.obj, 0, false)
             Citizen.InvokeNative(0xE054346CA3A0F315, data.obj, Config.RanchAnimals[i].x, Config.RanchAnimals[i].y, Config.RanchAnimals[i].z, 50.0, tonumber(1077936128), tonumber(1086324736), 1)
@@ -182,9 +184,9 @@ RegisterNetEvent('rsg-ranch:client:animalinfo', function(data)
                     event = 'rsg-ranch:client:collectproduct',
                     args = {
                         ranchid = animals.ranchid,
-						animalid = animals.id,
+                        animalid = animals.id,
                         animalproduct = animals.product,
-						animalproductoutput = animals.productoutput,
+                        animalproductoutput = animals.productoutput,
                         animaltype = animals.animal
                     },
                     arrow = true
@@ -251,6 +253,66 @@ AddEventHandler('rsg-ranch:client:animalfollow', function(data)
     end
 end)
 
+-- herd livestock
+RegisterNetEvent('rsg-ranch:client:herdanimals', function(animaltype)
+    local PlayerData = RSGCore.Functions.GetPlayerData()
+    local playerjob = PlayerData.job.name
+
+    for i, v in ipairs(Config.AuthorisedJobs) do
+        if v ~= playerjob then
+            lib.notify({ title = 'Not Allowed', description = 'only rancher\'s are able to do this!', type = 'error' })
+            return
+        end
+    end
+
+    -- herd animals
+    local player = PlayerPedId()
+    local playerCoords = GetEntityCoords(player)
+    local animalOffset = vector3(0.0, 2.0, 0.0)
+
+    for k, v in ipairs(SpawnedAnimals) do
+
+        local entity = v.obj
+        local x,y,z = table.unpack(GetEntityCoords(entity))
+        local dist = GetDistanceBetweenCoords(playerCoords.x, playerCoords.y, playerCoords.z, x, y, z, true)
+            
+        if dist >= 50.0 then 
+            goto continue 
+        end
+        
+        if v.animal == animaltype and v.ranchid == playerjob then
+            ClearPedTasks(entity)
+            --print(entity, player, animalOffset.x, animalOffset.y, animalOffset.z)
+            TaskFollowToOffsetOfEntity(entity, player, animalOffset.x, animalOffset.y, animalOffset.z, 1.0, -1, 0.0, 1)
+        end
+        
+        ::continue::
+    end
+
+end)
+
+RegisterNetEvent('rsg-ranch:client:unherdanimals', function(animal)
+    local PlayerData = RSGCore.Functions.GetPlayerData()
+    local playerjob = PlayerData.job.name
+
+    for i, v in ipairs(Config.AuthorisedJobs) do
+        if v ~= playerjob then
+            lib.notify({ title = 'Not Allowed', description = 'only rancher\'s are able to do this!', type = 'error' })
+            return
+        end
+    end
+
+    -- herd animals
+    local player = PlayerPedId()
+    local playerCoords = GetEntityCoords(player)
+
+    for i, v in ipairs(SpawnedAnimals) do
+        local entity = v.obj
+        local x,y,z = table.unpack(GetEntityCoords(entity))
+        Citizen.InvokeNative(0xE054346CA3A0F315, entity, x, y, z, 50.0, tonumber(1077936128), tonumber(1086324736), 1)
+    end
+end)
+
 -------------------------------------------------------------------------------
 
 AddEventHandler('onResourceStop', function(resource)
@@ -266,7 +328,7 @@ AddEventHandler('onResourceStop', function(resource)
 end)
 
 -------------------------------------------------------------
--- testing stuff
+-- testing stuff can delete
 -------------------------------------------------------------
 
 --[[
@@ -335,5 +397,9 @@ AddEventHandler('rsg-ranch:client:newanimal', function(animal, hash, product, co
 
     Wait(3000)
 end)
+
+    for k, v in pairs(SpawnedAnimals) do
+        print(k, json.encode(v))
+    end
 
 --]]

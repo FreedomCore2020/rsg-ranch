@@ -32,6 +32,18 @@ end
 
 -----------------------------------------------------------------------
 
+RSGCore.Commands.Add('herd', 'Herd Animals (Ranchers Only)', { { name = 'animal type', help = 'Type of animal to herd' } }, true, function(source, args)
+    local src = source
+    TriggerClientEvent('rsg-ranch:client:herdanimals', src, args[1])
+end)
+
+RSGCore.Commands.Add('herdoff', 'Un-Herd Animals (Ranchers Only)', {}, false, function(source)
+    local src = source
+    TriggerClientEvent('rsg-ranch:client:unherdanimals', src)
+end)
+
+-----------------------------------------------------------------------
+
 -- get all animal data
 RSGCore.Functions.CreateCallback('rsg-ranch:server:getanimaldata', function(source, cb, animalid)
     MySQL.query('SELECT * FROM ranch_animals WHERE animalid = ?', {animalid}, function(result)
@@ -82,7 +94,7 @@ AddEventHandler('rsg-ranch:server:newanimal', function(data)
 
     --print(data.animal, data.animalspawn.x, data.animalspawn.y, data.animalspawn.z, data.hash, data.playerjob, data.product, data.cost)
 
-	local src = source
+    local src = source
     local Player = RSGCore.Functions.GetPlayer(src)
     local animalid = math.random(111111, 999999)
     local AnimalData =
@@ -115,9 +127,10 @@ AddEventHandler('rsg-ranch:server:newanimal', function(data)
         
     else
         table.insert(Config.RanchAnimals, AnimalData)
-        TriggerEvent('rsg-ranch:server:saveAnimal', AnimalData, playerjob, animalid)
+        TriggerEvent('rsg-ranch:server:saveAnimal', AnimalData, data.playerjob, animalid)
         TriggerEvent('rsg-ranch:server:updateAnimals')
-        Player.Functions.RemoveMoney('cash', data.cost)
+        print(tonumber(data.cost))
+        Player.Functions.RemoveMoney('cash', tonumber(data.cost))
     end
 
 end)

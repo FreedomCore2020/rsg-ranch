@@ -49,6 +49,21 @@ RegisterNetEvent('rsg-ranch:client:dealershopMenu', function(animalspawn)
                 },
                 arrow = true
             },
+            {
+                title = 'Buy Sheep',
+                description = 'buy sheep',
+                icon = 'fa-solid fa-hat-cowboy',
+                serverEvent = 'rsg-ranch:server:newanimal',
+                args = {
+                    animal = 'sheep',
+                    hash = joaat('A_C_Sheep_01'),
+                    product = 'wool',
+                    cost = Config.SheepPrice,
+                    animalspawn = animalspawn,
+                    playerjob = playerjob
+                },
+                arrow = true
+            },
         }
     })
     lib.showContext('ranchdealer_mainmenu')
