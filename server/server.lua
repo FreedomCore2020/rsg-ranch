@@ -92,11 +92,16 @@ end)
 RegisterServerEvent('rsg-ranch:server:newanimal')
 AddEventHandler('rsg-ranch:server:newanimal', function(data)
 
-    --print(data.animal, data.animalspawn.x, data.animalspawn.y, data.animalspawn.z, data.hash, data.playerjob, data.product, data.cost)
-
     local src = source
     local Player = RSGCore.Functions.GetPlayer(src)
     local animalid = math.random(111111, 999999)
+    local money = Player.Functions.GetMoney('cash')
+
+    if money < data.cost then
+        TriggerClientEvent('ox_lib:notify', src, {title = 'Not Enough Cash', description = 'you don\'t have enough cash to do that!', type = 'error' })
+        goto continue 
+    end
+
     local AnimalData =
     {
         id = animalid,
@@ -129,9 +134,10 @@ AddEventHandler('rsg-ranch:server:newanimal', function(data)
         table.insert(Config.RanchAnimals, AnimalData)
         TriggerEvent('rsg-ranch:server:saveAnimal', AnimalData, data.playerjob, animalid)
         TriggerEvent('rsg-ranch:server:updateAnimals')
-        print(tonumber(data.cost))
         Player.Functions.RemoveMoney('cash', tonumber(data.cost))
     end
+
+    ::continue::
 
 end)
 
