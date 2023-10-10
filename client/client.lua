@@ -39,6 +39,13 @@ RegisterNetEvent('rsg-ranch:client:mainmenu', function(job)
                     event = 'rsg-bossmenu:client:mainmenu',
                     arrow = true
                 },
+                {
+                    title = 'Ranch Vehicle',
+                    description = 'access vehicle menu',
+                    icon = 'fa-solid fa-truck-ramp-box',
+                    event = 'rsg-jobwagon:client:openWagonMenu',
+                    arrow = true
+                },
             }
         })
         lib.showContext('ranch_mainmenu')
