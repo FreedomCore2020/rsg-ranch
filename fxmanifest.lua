@@ -7,7 +7,7 @@ game 'rdr3'
 
 author 'RexShack#3041'
 description 'rsg-ranch'
-version '1.1.2'
+version '1.1.3'
 
 shared_scripts {
     '@ox_lib/init.lua',

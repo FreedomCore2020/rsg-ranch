@@ -215,16 +215,12 @@ RegisterNetEvent('rsg-ranch:server:updateposition', function(animalid, posx, pos
 
     if not result then goto continue end
 
-    for i = 1, #result do
-        local id = result[i].id
-        local animalData = json.decode(result[i].animals)
-        
-        -- set position
+    for k, v in pairs(result) do
+        local animalData = json.decode(v.animals)
         animalData.x = posx
         animalData.y = posy
         animalData.z = posz
-        
-        MySQL.update("UPDATE ranch_animals SET `animals` = ? WHERE `id` = ?", {json.encode(animalData), id})    
+        MySQL.update("UPDATE ranch_animals SET `animals` = ? WHERE `animalid` = ?", {json.encode(animalData), animalid})
     end
 
     ::continue::

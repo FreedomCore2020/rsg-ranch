@@ -94,6 +94,9 @@ Citizen.CreateThread(function()
             data.obj = CreatePed(modelHash, Config.RanchAnimals[i].x, Config.RanchAnimals[i].y, Config.RanchAnimals[i].z -1.2, true, true, false)
             data.ranchid = Config.RanchAnimals[i].ranchid
             data.animal = Config.RanchAnimals[i].animal
+            data.posx = Config.RanchAnimals[i].x
+            data.posy = Config.RanchAnimals[i].y
+            data.posz = Config.RanchAnimals[i].z
             SetEntityHeading(data.obj, Config.RanchAnimals[i].h)
             Citizen.InvokeNative(0x77FF8D35EEC6BBC4, data.obj, 0, false)
             Citizen.InvokeNative(0xE054346CA3A0F315, data.obj, Config.RanchAnimals[i].x, Config.RanchAnimals[i].y, Config.RanchAnimals[i].z, 50.0, tonumber(1077936128), tonumber(1086324736), 1)
@@ -218,14 +221,12 @@ end)
 -- set new animal position and handle animal being killed
 Citizen.CreateThread(function()
     while true do
-        for i = 1, #SpawnedAnimals do
-            local animals = SpawnedAnimals[i].obj
-            local animalid = SpawnedAnimals[i].id
-            local pos = GetEntityCoords(animals)
-            if IsPedDeadOrDying(animals, true) then
-                TriggerServerEvent('rsg-ranch:server:animalkilled', animalid)
+        for k, v in pairs(SpawnedAnimals) do
+            if IsPedDeadOrDying(v.obj, true) then
+                TriggerServerEvent('rsg-ranch:server:animalkilled', v.id)
             else
-                TriggerServerEvent('rsg-ranch:server:updateposition', animalid, pos.x, pos.y, pos.z)
+                local pos = GetEntityCoords(v.obj)
+                TriggerServerEvent('rsg-ranch:server:updateposition', v.id, pos.x, pos.y, pos.z)
             end
         end
         Wait(5000)
