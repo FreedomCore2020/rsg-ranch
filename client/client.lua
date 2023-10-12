@@ -2,6 +2,7 @@ local RSGCore = exports['rsg-core']:GetCoreObject()
 local SpawnedAnimals = {}
 local isBusy = false
 local isFollowing = false
+local wanderDist = 0
 
 -------------------------------------------------------------------------------------------
 -- prompts and blips
@@ -60,6 +61,16 @@ AddEventHandler('rsg-ranch:client:updateAnimalData', function(data)
     Config.RanchAnimals = data
 end)
 
+function WanderDistance(animalType)
+    if animalType == 'cow' then
+        wanderDist = Config.CowWanderDistance
+    end
+    if animalType == 'sheep' then
+        wanderDist = Config.SheepWanderDistance
+    end
+    return wanderDist
+end
+
 -- spawn ranch animals
 Citizen.CreateThread(function()
     while true do
@@ -106,7 +117,8 @@ Citizen.CreateThread(function()
             data.posz = Config.RanchAnimals[i].z
             SetEntityHeading(data.obj, Config.RanchAnimals[i].h)
             Citizen.InvokeNative(0x77FF8D35EEC6BBC4, data.obj, 0, false)
-            Citizen.InvokeNative(0xE054346CA3A0F315, data.obj, Config.RanchAnimals[i].x, Config.RanchAnimals[i].y, Config.RanchAnimals[i].z, 50.0, tonumber(1077936128), tonumber(1086324736), 1)
+            wanderDist = WanderDistance(data.animal)
+            Citizen.InvokeNative(0xE054346CA3A0F315, data.obj, Config.RanchAnimals[i].x, Config.RanchAnimals[i].y, Config.RanchAnimals[i].z, wanderDist, tonumber(1077936128), tonumber(1086324736), 1)
             Citizen.InvokeNative(0x23f74c2fda6e7c61, -1749618580, data.obj)
             SetEntityAsMissionEntity(data.obj, true)
             SetModelAsNoLongerNeeded(data.obj)
@@ -128,6 +140,7 @@ Citizen.CreateThread(function()
                         type = "client",
                         event = 'rsg-ranch:client:animalfollow',
                         entity = data.obj,
+                        animal = data.animal,
                         icon = "far fa-eye",
                         label = 'Follow Toggle'
                     }
@@ -256,8 +269,9 @@ AddEventHandler('rsg-ranch:client:animalfollow', function(data)
         TaskFollowToOffsetOfEntity(data.entity, player, animalOffset.x, animalOffset.y, animalOffset.z, 1.0, -1, 0.0, 1)
     else
         isFollowing = false
+        wanderDist = WanderDistance(data.animal)
         local x,y,z = table.unpack(GetEntityCoords(data.entity))
-        Citizen.InvokeNative(0xE054346CA3A0F315, data.entity, x, y, z, 50.0, tonumber(1077936128), tonumber(1086324736), 1)
+        Citizen.InvokeNative(0xE054346CA3A0F315, data.entity, x, y, z, wanderDist, tonumber(1077936128), tonumber(1086324736), 1)
     end
 end)
 
@@ -317,7 +331,8 @@ RegisterNetEvent('rsg-ranch:client:unherdanimals', function(animal)
     for i, v in ipairs(SpawnedAnimals) do
         local entity = v.obj
         local x,y,z = table.unpack(GetEntityCoords(entity))
-        Citizen.InvokeNative(0xE054346CA3A0F315, entity, x, y, z, 50.0, tonumber(1077936128), tonumber(1086324736), 1)
+        wanderDist = WanderDistance(animal)
+        Citizen.InvokeNative(0xE054346CA3A0F315, entity, x, y, z, wanderDist, tonumber(1077936128), tonumber(1086324736), 1)
     end
 end)
 

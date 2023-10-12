@@ -13,6 +13,11 @@ Config.AnimalTargetDistance = 5.0
 
 -- animal cost
 Config.CowPrice = 50
+Config.SheepPrice = 25
+
+-- animal wander distance
+Config.CowWanderDistance = 4.0
+Config.SheepWanderDistance = 3.0
 
 -- authorised jobs
 Config.AuthorisedJobs = {

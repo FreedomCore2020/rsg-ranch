@@ -37,9 +37,9 @@ RSGCore.Commands.Add('herd', 'Herd Animals (Ranchers Only)', { { name = 'animal 
     TriggerClientEvent('rsg-ranch:client:herdanimals', src, args[1])
 end)
 
-RSGCore.Commands.Add('herdoff', 'Un-Herd Animals (Ranchers Only)', {}, false, function(source)
+RSGCore.Commands.Add('herdoff', 'Un-Herd Animals (Ranchers Only)', { { name = 'animal type', help = 'Type of animal to un-herd' } }, true, function(source, args)
     local src = source
-    TriggerClientEvent('rsg-ranch:client:unherdanimals', src)
+    TriggerClientEvent('rsg-ranch:client:unherdanimals', src, args[1])
 end)
 
 -----------------------------------------------------------------------
