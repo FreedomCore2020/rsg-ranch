@@ -64,9 +64,26 @@ RegisterNetEvent('rsg-ranch:client:dealershopMenu', function(animalspawn)
                 },
                 arrow = true
             },
+            {
+                title = 'Ranch Dealer Shop',
+                description = 'buy chickens, animal feed, etc..',
+                icon = 'fa-solid fa-hat-cowboy',
+                event = 'rsg-ranch:client:OpenRanchDealerShop',
+                args = {},
+                arrow = true
+            },
         }
     })
     lib.showContext('ranchdealer_mainmenu')
     
 end)
 
+-- ranch trader shop
+RegisterNetEvent('rsg-ranch:client:OpenRanchDealerShop')
+AddEventHandler('rsg-ranch:client:OpenRanchDealerShop', function()
+    local ShopItems = {}
+    ShopItems.label = 'Ranch Dealer Shop'
+    ShopItems.items = Config.RanchDealerShop
+    ShopItems.slots = #Config.RanchDealerShop
+    TriggerServerEvent("inventory:server:OpenInventory", "shop", "RanchDealerShop_"..math.random(1, 99), ShopItems)
+end)

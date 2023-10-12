@@ -3,6 +3,7 @@ local SpawnedAnimals = {}
 local isBusy = false
 local isFollowing = false
 local wanderDist = 0
+local cost = 0
 
 -------------------------------------------------------------------------------------------
 -- prompts and blips
@@ -68,8 +69,65 @@ function WanderDistance(animalType)
     if animalType == 'sheep' then
         wanderDist = Config.SheepWanderDistance
     end
+    if animalType == 'chicken' then
+        wanderDist = Config.ChickenWanderDistance
+    end
+    if animalType == 'pig' then
+        wanderDist = Config.PigWanderDistance
+    end
     return wanderDist
 end
+
+-- new animal : use item
+RegisterNetEvent('rsg-ranch:client:newanimaluseitem')
+AddEventHandler('rsg-ranch:client:newanimaluseitem', function(animal, hash, product)
+    local PlayerData = RSGCore.Functions.GetPlayerData()
+    local playerjob = PlayerData.job.name
+
+    for i, v in ipairs(Config.AuthorisedJobs) do
+        if v ~= playerjob then
+            lib.notify({ title = 'Not Allowed', description = 'only rancher\'s are able to do this!', type = 'error' })
+            return
+        end
+    end
+
+    local animalspawn = GetOffsetFromEntityInWorldCoords(PlayerPedId(), 0.0, 3.0, 0.0)
+    local heading = GetEntityHeading(PlayerPedId())
+    local ped = PlayerPedId()
+
+    if not IsPedInAnyVehicle(PlayerPedId(), false) and not isBusy then
+        isBusy = true
+        local anim1 = `WORLD_HUMAN_CROUCH_INSPECT`
+        FreezeEntityPosition(ped, true)
+        TaskStartScenarioInPlace(ped, anim1, 0, true)
+        Wait(10000)
+        ClearPedTasks(ped)
+        FreezeEntityPosition(ped, false)
+        if animal == 'chicken' then
+            cost = Config.ChickenPrice
+        end
+        if animal == 'pig' then
+            cost = Config.PigPrice
+        end
+        data = {
+            animal = animal, 
+            animalspawn = animalspawn,
+            heading = heading, 
+            hash = hash,
+            playerjob = playerjob,
+            product = product,
+            cost = cost
+        }
+        TriggerServerEvent('rsg-ranch:server:newanimal', data)
+        TriggerServerEvent('rsg-ranch:server:removeitem', animal, 1)
+        isBusy = false
+        return
+    end
+
+    lib.notify({ title = 'Problem', description = 'can\'t place it while in a vehicle!', type = 'error' })
+
+    Wait(3000)
+end)
 
 -- spawn ranch animals
 Citizen.CreateThread(function()
@@ -385,9 +443,9 @@ RegisterNetEvent('rsg-ranch:client:testoutput', function()
 
 end)
 
--- new animal deploy
-RegisterNetEvent('rsg-ranch:client:newanimal')
-AddEventHandler('rsg-ranch:client:newanimal', function(animal, hash, product, cost)
+-- new animal use item
+RegisterNetEvent('rsg-ranch:client:newanimaluseitem')
+AddEventHandler('rsg-ranch:client:newanimaluseitem', function(animal, hash, product, cost)
     local PlayerData = RSGCore.Functions.GetPlayerData()
     local playerjob = PlayerData.job.name
 

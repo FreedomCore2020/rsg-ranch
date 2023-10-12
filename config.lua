@@ -14,10 +14,14 @@ Config.AnimalTargetDistance = 5.0
 -- animal cost
 Config.CowPrice = 50
 Config.SheepPrice = 25
+Config.ChickenPrice = 1
+Config.PigPrice = 1
 
 -- animal wander distance
 Config.CowWanderDistance = 4.0
 Config.SheepWanderDistance = 3.0
+Config.ChickenWanderDistance = 0.5
+Config.PigWanderDistance = 2.0
 
 -- authorised jobs
 Config.AuthorisedJobs = {
@@ -75,10 +79,17 @@ Config.RanchAnimalDealer = {
         id = 'armranchdealer',
         name = 'Ranch Dealer',
         coords = vector3(-3676.736, -2556.874, -13.57845),
-		animalspawn = vector3(-3670.964, -2557.247, -13.58261),
+        animalspawn = vector3(-3670.964, -2557.247, -13.58261),
         showblip = true
     },
     
+}
+
+Config.RanchDealerShop = {
+    -- shop items
+    [1] = { name = 'chicken',    price = 5, amount = 50, info = {}, type = 'item', slot = 1, },
+    [2] = { name = 'pig',        price = 5, amount = 50, info = {}, type = 'item', slot = 2, },
+    [3] = { name = 'animalfeed', price = 1, amount = 50, info = {}, type = 'item', slot = 3, },
 }
 
 -- npc coords

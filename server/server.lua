@@ -32,6 +32,20 @@ end
 
 -----------------------------------------------------------------------
 
+-- use chicken
+RSGCore.Functions.CreateUseableItem("chicken", function(source)
+    local src = source
+    TriggerClientEvent('rsg-ranch:client:newanimaluseitem', src, 'chicken', joaat('a_c_chicken_01'), 'egg')
+end)
+
+-- use pig
+RSGCore.Functions.CreateUseableItem("pig", function(source)
+    local src = source
+    TriggerClientEvent('rsg-ranch:client:newanimaluseitem', src, 'pig', joaat('a_c_pig_01'), 'truffle')
+end)
+
+-----------------------------------------------------------------------
+
 RSGCore.Commands.Add('herd', 'Herd Animals (Ranchers Only)', { { name = 'animal type', help = 'Type of animal to herd' } }, true, function(source, args)
     local src = source
     TriggerClientEvent('rsg-ranch:client:herdanimals', src, args[1])
@@ -96,7 +110,6 @@ AddEventHandler('rsg-ranch:server:newanimal', function(data)
     local Player = RSGCore.Functions.GetPlayer(src)
     local animalid = math.random(111111, 999999)
     local money = Player.Functions.GetMoney('cash')
-
     if money < data.cost then
         TriggerClientEvent('ox_lib:notify', src, {title = 'Not Enough Cash', description = 'you don\'t have enough cash to do that!', type = 'error' })
         goto continue 
@@ -232,6 +245,21 @@ AddEventHandler('rsg-ranch:server:animalkilled', function(animalid)
     MySQL.update('DELETE FROM ranch_animals WHERE animalid = ?', {animalid})
     TriggerEvent('rsg-log:server:CreateLog', 'ranch', 'Ranch Animal Killed', 'red', 'animal with the branding id of '..animalid..' was killed!')
 end)
+
+-----------------------------------------------------------------------------------
+
+-- remove item/amount
+RegisterServerEvent('rsg-ranch:server:removeitem')
+AddEventHandler('rsg-ranch:server:removeitem', function(item, amount)
+    local src = source
+    local Player = RSGCore.Functions.GetPlayer(src)
+
+    if Player.Functions.RemoveItem(item, amount) then
+        TriggerClientEvent('inventory:client:ItemBox', src, RSGCore.Shared.Items[item], 'remove')
+    end
+end)
+
+-----------------------------------------------------------------------------------
 
 --------------------------------------------------------------------------------------------------
 -- ranch upkeep system
