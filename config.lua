@@ -23,11 +23,6 @@ Config.SheepWanderDistance = 3.0
 Config.ChickenWanderDistance = 0.5
 Config.PigWanderDistance = 2.0
 
--- authorised jobs
-Config.AuthorisedJobs = {
-    'macfarranch',
-}
-
 -- ranch blip settings
 Config.RanchBlip = {
     blipName   = 'Ranch', -- Config.Blip.blipName
@@ -50,12 +45,19 @@ Config.RanchDealerBlip = {
 }
 
 Config.RanchLocations = {
-    {
+    {    -- IMPORTANT : ranchid & job must be the same
         name = 'Macfarlane Ranch',
         ranchid = 'macfarranch',
         coords = vector3(-2375.171, -2374.125, 62.37881),
         job = 'macfarranch',
-        showblip   = true
+        showblip = true
+    },
+    {
+        name = 'Pronghorn Ranch',
+        ranchid = 'prongranch',
+        coords = vector3(-2568.169, 353.48822, 151.47889),
+        job = 'prongranch',
+        showblip = true
     },
 }
 
@@ -80,9 +82,18 @@ Config.RanchAnimalDealer = {
         name = 'Ranch Dealer',
         coords = vector3(-3676.736, -2556.874, -13.57845),
         animalspawn = vector3(-3670.964, -2557.247, -13.58261),
+        jobaccess = 'macfarranch',
         showblip = true
     },
-    
+    {
+        id = 'strranchdealer',
+        name = 'Ranch Dealer',
+        coords = vector3(-1772.601, -434.5156, 155.08004),
+        animalspawn = vector3(-1776.907, -433.4537, 155.07099),
+        jobaccess = 'prongranch',
+        showblip = true
+    },
+
 }
 
 Config.RanchDealerShop = {
@@ -93,6 +104,16 @@ Config.RanchDealerShop = {
 }
 
 -- npc coords
+-------------------------------------------------------------------------------
+-- Macfarlane Ranch
 -- vector4(-2375.171, -2374.125, 62.37881, 194.37658) -- boss menu
 -- vector4(-2367.547, -2387.013, 62.176456, 5.2386674) -- ranch shop
+-------------------------------------------------------------------------------
+-- Pronghorn Ranch
+-- vector4(-2568.169, 353.48822, 151.47889, 358.87481)  -- boss menu
+-- vector4(-2572.45, 362.97662, 150.49966, 86.822937) -- wagon spawn
+-------------------------------------------------------------------------------
+-- Ranch Dealers
 -- vector4(-3676.736, -2556.874, -13.57845, 272.95428) -- ranch dealer amadillo
+-- vector4(-1772.601, -434.5156, 155.08004, 111.57814) -- ranch dealre stawberry
+-------------------------------------------------------------------------------
