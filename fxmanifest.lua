@@ -19,12 +19,14 @@ shared_scripts {
 client_scripts {
     'client/client.lua',
     'client/client_shop.lua',
-    'client/client_dealer.lua'
+    'client/client_dealer.lua',
+    'client/client_jobs.lua'
 }
 
 server_scripts {
     'server/server.lua',
     'server/server_shop.lua',
+    'server/server_jobs.lua',
     '@oxmysql/lib/MySQL.lua',
 }
 
