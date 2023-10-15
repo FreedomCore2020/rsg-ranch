@@ -134,9 +134,10 @@ Citizen.CreateThread(function()
         local InRange = false
 
         for i = 1, #Config.RanchAnimals do
-        
-            local dist = GetDistanceBetweenCoords(pos.x, pos.y, pos.z, Config.RanchAnimals[i].x, Config.RanchAnimals[i].y, Config.RanchAnimals[i].z, true)
-            
+
+            local coords = vector3(Config.RanchAnimals[i].x, Config.RanchAnimals[i].y, Config.RanchAnimals[i].z)
+            local dist = #(pos - coords)
+
             if dist >= 50.0 then goto continue end
 
             local hasSpawned = false
