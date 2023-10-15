@@ -329,64 +329,59 @@ AddEventHandler('rsg-ranch:client:animalfollow', function(data)
     end
 end)
 
+-------------------------------------------------------------------------------
+
 -- herd livestock
 RegisterNetEvent('rsg-ranch:client:herdanimals', function(animaltype)
     local PlayerData = RSGCore.Functions.GetPlayerData()
     local playerjob = PlayerData.job.name
 
-    for i, v in ipairs(Config.AuthorisedJobs) do
-        if v ~= playerjob then
-            lib.notify({ title = 'Not Allowed', description = 'only rancher\'s are able to do this!', type = 'error' })
-            return
-        end
-    end
+    if (playerjob == 'macfarranch') or (playerjob == 'prongranch') then
 
-    -- herd animals
-    local player = PlayerPedId()
-    local playerCoords = GetEntityCoords(player)
-    local animalOffset = vector3(0.0, 2.0, 0.0)
+        -- herd animals
+        local player = PlayerPedId()
+        local playerCoords = GetEntityCoords(player)
+        local animalOffset = vector3(0.0, 2.0, 0.0)
 
-    for k, v in ipairs(SpawnedAnimals) do
+        for k, v in ipairs(SpawnedAnimals) do
 
-        local entity = v.obj
-        local x,y,z = table.unpack(GetEntityCoords(entity))
-        local dist = GetDistanceBetweenCoords(playerCoords.x, playerCoords.y, playerCoords.z, x, y, z, true)
+            local entity = v.obj
+            local entityCoords = GetEntityCoords(entity)
+            local dist = #(playerCoords - entityCoords)
+                
+            if dist >= 50.0 then 
+                goto continue 
+            end
             
-        if dist >= 50.0 then 
-            goto continue 
+            if v.animal == animaltype and v.ranchid == playerjob then
+                ClearPedTasks(entity)
+                TaskFollowToOffsetOfEntity(entity, player, animalOffset.x, animalOffset.y, animalOffset.z, 1.0, -1, 0.0, 1)
+            end
+            ::continue::
         end
-        
-        if v.animal == animaltype and v.ranchid == playerjob then
-            ClearPedTasks(entity)
-            --print(entity, player, animalOffset.x, animalOffset.y, animalOffset.z)
-            TaskFollowToOffsetOfEntity(entity, player, animalOffset.x, animalOffset.y, animalOffset.z, 1.0, -1, 0.0, 1)
-        end
-        
-        ::continue::
+    else
+        lib.notify({ title = 'Not Allowed', description = 'only rancher\'s are able to do this!', type = 'error' })
     end
-
 end)
 
+-- unherd livestock
 RegisterNetEvent('rsg-ranch:client:unherdanimals', function(animal)
     local PlayerData = RSGCore.Functions.GetPlayerData()
     local playerjob = PlayerData.job.name
 
-    for i, v in ipairs(Config.AuthorisedJobs) do
-        if v ~= playerjob then
-            lib.notify({ title = 'Not Allowed', description = 'only rancher\'s are able to do this!', type = 'error' })
-            return
+    if (playerjob == 'macfarranch') or (playerjob == 'prongranch') then
+        -- unherd animals
+        local player = PlayerPedId()
+        local playerCoords = GetEntityCoords(player)
+
+        for i, v in ipairs(SpawnedAnimals) do
+            local entity = v.obj
+            local x,y,z = table.unpack(GetEntityCoords(entity))
+            wanderDist = WanderDistance(animal)
+            Citizen.InvokeNative(0xE054346CA3A0F315, entity, x, y, z, wanderDist, tonumber(1077936128), tonumber(1086324736), 1)
         end
-    end
-
-    -- herd animals
-    local player = PlayerPedId()
-    local playerCoords = GetEntityCoords(player)
-
-    for i, v in ipairs(SpawnedAnimals) do
-        local entity = v.obj
-        local x,y,z = table.unpack(GetEntityCoords(entity))
-        wanderDist = WanderDistance(animal)
-        Citizen.InvokeNative(0xE054346CA3A0F315, entity, x, y, z, wanderDist, tonumber(1077936128), tonumber(1086324736), 1)
+    else
+        lib.notify({ title = 'Not Allowed', description = 'only rancher\'s are able to do this!', type = 'error' })
     end
 end)
 
