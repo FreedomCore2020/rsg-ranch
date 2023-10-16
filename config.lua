@@ -72,6 +72,13 @@ Config.RanchShops = {
         jobaccess = 'macfarranch',
         showblip = true
     },
+    {
+        shopid = 'prongranchshop',
+        shopname = 'Ranch Shop',
+        coords = vector3(-2560.69, 402.01995, 148.22892),
+        jobaccess = 'prongranch',
+        showblip = true
+    },
     
 }
 
@@ -128,9 +135,11 @@ Config.RanchDealerShop = {
 -- Macfarlane Ranch
 -- vector4(-2375.171, -2374.125, 62.37881, 194.37658) -- boss menu
 -- vector4(-2367.547, -2387.013, 62.176456, 5.2386674) -- ranch shop
+-- vector4(-2376.891, -2383.489, 61.529312, 185.90876) -- wagon spawn
 -------------------------------------------------------------------------------
 -- Pronghorn Ranch
 -- vector4(-2568.169, 353.48822, 151.47889, 358.87481)  -- boss menu
+-- vector4(-2560.69, 402.01995, 148.22892, 95.87107) -- ranch shop
 -- vector4(-2572.45, 362.97662, 150.49966, 86.822937) -- wagon spawn
 -------------------------------------------------------------------------------
 -- Ranch Dealers

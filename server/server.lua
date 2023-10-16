@@ -191,7 +191,7 @@ RegisterNetEvent('rsg-ranch:server:feedanimal', function(animalid, animalhealth,
     end
 end)
 
--- colect product from animal
+-- collect product from animal
 RegisterNetEvent('rsg-ranch:server:collectproduct', function(ranchid, animalid, animalproduct, animalproductoutput, animaltype)
     local src = source
     local Player = RSGCore.Functions.GetPlayer(src)
@@ -218,6 +218,25 @@ RegisterNetEvent('rsg-ranch:server:collectproduct', function(ranchid, animalid, 
             end
         end)
     end
+
+end)
+
+-- collect job product
+RegisterNetEvent('rsg-ranch:server:collectjobproduct', function(ranchid, jobproduct, amount)
+    local src = source
+    local Player = RSGCore.Functions.GetPlayer(src)
+
+    local giveamount = amount
+    
+    MySQL.query('SELECT * FROM ranch_stock WHERE jobaccess = ? AND item = ?',{ranchid, jobproduct} , function(result)
+        if result[1] ~= nil then
+            local stockadd = result[1].stock + giveamount
+            MySQL.update('UPDATE ranch_stock SET stock = ? WHERE jobaccess = ? AND item = ?',{stockadd, ranchid, jobproduct})
+            TriggerClientEvent('ox_lib:notify', src, {title = 'Stock Added', description = jobproduct..' has been added to your stock', type = 'inform' })
+        else
+            MySQL.insert('INSERT INTO ranch_stock (`jobaccess`, `item`, `stock`) VALUES (?, ?, ?);', {ranchid, jobproduct, giveamount})
+        end
+    end)
 
 end)
 

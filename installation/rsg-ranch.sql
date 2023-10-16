@@ -26,7 +26,8 @@ CREATE TABLE IF NOT EXISTS `ranch_shop` (
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
 INSERT INTO `ranch_shop` (`shopid`, `jobaccess`, `displayname`, `money`) VALUES
-('macfarranchshop', 'macfarranch', 'Macfarlan Ranch Shop', 0);
+('macfarranchshop', 'macfarranch', 'Macfarlan Ranch Shop', 0),
+('prongranchshop', 'prongranch', 'Pronghorn Ranch Shop', 0);
 
 DROP TABLE IF EXISTS `ranch_shop_stock`;
 CREATE TABLE `ranch_shop_stock` (

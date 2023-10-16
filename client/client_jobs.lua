@@ -75,7 +75,7 @@ AddEventHandler('rsg-ranch:client:collectpoo', function()
                         DeleteEntity(pooObject)
                         SetObjectAsNoLongerNeeded(pooObject)
                         TriggerServerEvent('rsg-ranch:server:collectedpoop', coords)
-                        TriggerServerEvent('rsg-ranch:server:giveitem', 'fertilizer', 1)
+                        TriggerServerEvent('rsg-ranch:server:collectjobproduct', PlayerJob, 'fertilizer', 1)
                         lib.notify({ title = 'Fertilizer Collected', description = 'you successfully collected some fertilizer!', type = 'success' })
                     else
                         DeleteEntity(pooObject)
