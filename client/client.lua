@@ -188,15 +188,16 @@ Citizen.CreateThread(function()
                         event = 'rsg-ranch:client:animalinfo',
                         id = Config.RanchAnimals[i].id,
                         icon = "far fa-eye",
-                        label = 'Check Animal',
+                        label = 'Animal Info',
                     },
                     {
                         type = "client",
-                        event = 'rsg-ranch:client:animalfollow',
+                        event = 'rsg-ranch:client:animalactions',
+                        id = Config.RanchAnimals[i].id,
                         entity = data.obj,
                         animal = data.animal,
                         icon = "far fa-eye",
-                        label = 'Follow Toggle'
+                        label = 'Animal Actions'
                     }
                 },
                 distance = Config.AnimalTargetDistance
@@ -211,6 +212,7 @@ Citizen.CreateThread(function()
     end
 end)
 
+-- animal info menu
 RegisterNetEvent('rsg-ranch:client:animalinfo', function(data)
     RSGCore.Functions.TriggerCallback('rsg-ranch:server:getanimaldata', function(result)
         local animals = json.decode(result[1].animals)
@@ -242,6 +244,31 @@ RegisterNetEvent('rsg-ranch:client:animalinfo', function(data)
                     description = animals.animal..' '..animals.productoutput..' production in progress',
                     icon = 'fa-solid fa-bars-progress',
                 },
+            }
+        })
+        lib.showContext('ranch_animalinfo')
+    end, data.id)
+end)
+
+-- animal actions menu
+RegisterNetEvent('rsg-ranch:client:animalactions', function(data)
+    RSGCore.Functions.TriggerCallback('rsg-ranch:server:getanimaldata', function(result)
+        local animals = json.decode(result[1].animals)
+        lib.registerContext({
+            id = 'ranch_animalactions',
+            title = 'Animal Actions',
+            options = {
+                {
+                    title = 'Toggle Animal Follow',
+                    description = 'ask your animal to follow you',
+                    icon = 'fa-solid fa-wheat-awn',
+                    event = 'rsg-ranch:client:animalfollow',
+                    args = {
+                        entity = data.entity,
+                        animal = data.animal
+                    },
+                    arrow = true
+                },
                 {
                     title = 'Feed Animal',
                     description = 'feed animal to improve health',
@@ -270,7 +297,7 @@ RegisterNetEvent('rsg-ranch:client:animalinfo', function(data)
                 },
             }
         })
-        lib.showContext('ranch_animalinfo')
+        lib.showContext('ranch_animalactions')
     end, data.id)
 end)
 
