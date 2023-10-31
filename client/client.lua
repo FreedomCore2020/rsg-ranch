@@ -176,6 +176,7 @@ Citizen.CreateThread(function()
             Citizen.InvokeNative(0x23f74c2fda6e7c61, -1749618580, data.obj)
             SetEntityAsMissionEntity(data.obj, true)
             SetModelAsNoLongerNeeded(data.obj)
+            SetRelationshipBetweenGroups(1, GetPedRelationshipGroupHash(data.obj), joaat('PLAYER'))
 
             SpawnedAnimals[#SpawnedAnimals + 1] = data
             hasSpawned = false
